@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+		<meta charset="utf-8">
+		<title>Responseable Knowledgebase</title>
+		<meta name="generator" content="Bootply" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+		<link href="css/bootstrap.min.css" rel="stylesheet">
+		 <link rel="stylesheet" href="css/dashboard.css">
+		<!--[if lt IE 9]>
+			<script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
+		<![endif]-->
+		<link href="css/styles.css" rel="stylesheet">
+		<style>
+			body{
+				padding:0px;
+			}
+			.btn-group {  
+				white-space: nowrap;              
+			}
+			.btn-group .btn {  
+				float: none;
+				display: inline-block;
+			}
+			 .btn + .dropdown-toggle { 
+				margin-left: -4px;
+			}
+
+			.table-responsive {
+			  overflow-x: visible !important;
+			  overflow-y: visible !important;
+			}
+			.node.type4 {
+			  fill:#000000;
+			  stroke:#1695A3; 
+			  stroke-width: 3px;
+			}
+		</style>
+
+	</head>
+	<body>
+		<!-- header -->
+		<div id="top-nav" class="navbar navbar-inverse navbar-static-top">
+			<div class="container-fluid">
+				<div class="navbar-header">
+					<button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+						<span class="icon-bar"></span>
+						<span class="icon-bar"></span>
+						<span class="icon-bar"></span>
+					</button>
+					<a class="navbar-brand" href="#">Responseable Knowledgebase</a>
+				</div>
+			</div>
+			<!-- /container -->
+		</div>
+		<!-- /Header -->
+
+
+<!-- Main -->
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-sm-2">
+            <!-- Left column -->
+            <!--<a href="#"><strong> Graph Tools</strong></a>-->
+			<a href="#"><strong> </strong></a>
+            <hr>
+			<button onclick="createNode('Node', 0, false,'Driver')" class="btn btn-primary">Create Node</button>
+			<br><br><br><br>
+			<ul class="nav nav-stacked collapse in" id="queryMenu">
+				<li> Query Path</li>
+				<input type="text" class="form-control" id="sourceNode" placeholder="Source Name">
+				<input type="text" class="form-control" id="targetNode" placeholder="Target Name">
+				<button onclick="highlightPath()" class="btn btn-primary">Highlight Path</button>
+			</ul>
+			
+			<br><br><br>
+			
+			<ul class="nav nav-stacked collapse in" id="relationshipMenu">
+				<li>Create Causal Relationship</li>
+				<input type="text" class="form-control" id="relSourceNode" placeholder="Source Name">
+				<input type="text" class="form-control" id="relTargetNode" placeholder="Target Name">
+				<button onclick="createRelationship()" class="btn btn-primary">Create Relationship</button>
+			</ul>
+        </div>
+        <!-- /col-3 -->
+        <div class="col-sm-10">
+            <hr>
+            <div class="row">
+                <!-- center left-->
+                <div class="col-md-8">
+					<div class="panel panel-default">
+                        <div class="panel-heading">
+                            <!--<h4>DPSIR Flow</h4>-->
+							<h4> </h4>
+						</div>
+                        <div class="panel-body" id="panel-body" style="height:390px;">
+					    </div>
+                    </div>
+                    <!--/panel-->
+                    <hr>
+                </div>
+                <!--/col-->
+                <div class="col-lg-4">
+                    <div class="table-responsive" id="table-responsive">
+                    </div>
+					<div class="button">
+						<button type="button" id="addProperty" class="btn btn-primary" onclick="addNewRow()" style="visibility:hidden">Add Property</button>
+						<button type="button" id="saveChanges" class="btn btn-primary" style="margin-left:20px;visibility:hidden" onclick="saveChanges()">Save Changes</button>
+					</div>
+                </div>
+                <!--/col-span-6-->
+            </div>
+            <!--/row-->
+        </div>
+        <!--/col-span-9-->
+    </div>
+</div>
+<!-- /Main -->
+
+<!-- script references -->
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.2/jquery.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+<script src="js/scripts.js"></script>
+<script src="js/bs-responsive-table-dropdown.min.js"></script>
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+<script src="js/main.js"></script>
+<script src="js/canvas.js"></script>
+<script src="js/neo4j.js"></script>
+<script src="js/rightSection.js"></script>
+<script type="text/javascript" src="http://mbostock.github.com/d3/d3.geom.js"></script>
+<script type="text/javascript" src="http://mbostock.github.com/d3/d3.layout.js"></script>
+</body>
+</html>
