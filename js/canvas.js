@@ -669,7 +669,7 @@ function highlightPath() {
 $.ajaxSetup({
     headers: {
         // Add authorization header in all ajax requests
-        "Authorization": "Basic bmVvNGo6T2NlYW4=" 
+        "Authorization": "Basic bmVvNGo6bmlzaGl0QDIz" 
     }
 });
 		
@@ -796,5 +796,7 @@ function createRelationship()
 	
 }
 
+//This method will query all the path between two nodes.
+//Success text status is success and data is {"results":[{"columns":["p"],"data":[{"row":[[{"title":"Tourism","name":"Tourism"},{"title":"PARENT","name":"PARENT"},{"title":"Quality","name":"Quality"}]]},{"row":[[{"title":"Tourism","name":"Tourism"},{"title":"CONTRIBUTES_TO","name":"CONTRIBUTES_TO"},{"title":"Coastal Debris","name":"Coastal Debris"},{"title":"IMPACTS","name":"IMPACTS"},{"title":"Quality","name":"Quality"}]]}]}],"errors":[]}
 
 

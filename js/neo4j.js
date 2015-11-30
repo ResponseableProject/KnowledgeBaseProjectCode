@@ -18,7 +18,7 @@ function getNodeData()
 $.ajaxSetup({
     headers: {
         // Add authorization header in all ajax requests
-        "Authorization": "Basic bmVvNGo6T2NlYW4=" 
+        "Authorization": "Basic bmVvNGo6bmlzaGl0QDIz" 
     }
 });
 
@@ -50,7 +50,7 @@ function showNodeFromNeo4j()
 $.ajaxSetup({
     headers: {
         // Add authorization header in all ajax requests
-        "Authorization": "Basic bmVvNGo6T2NlYW4=" 
+        "Authorization": "Basic bmVvNGo6bmlzaGl0QDIz" 
     }
 });
 
@@ -97,7 +97,7 @@ function showTwoNodes()
 $.ajaxSetup({
     headers: {
         // Add authorization header in all ajax requests
-        "Authorization": "Basic bmVvNGo6T2NlYW4=" 
+        "Authorization": "Basic bmVvNGo6bmlzaGl0QDIz" 
     }
 });
 
@@ -136,7 +136,8 @@ $.ajax({
  *	Description: Create a node in Neo4j
  ****************************************************************************/
 function saveChanges(){
-	
+	alert('12');
+	//getNewPropertiesForUpdate();
 	$('#saveChanges').prop('disabled', true);
 
 var relationshipType=$('#relationshipType').val();
@@ -159,13 +160,20 @@ $.each($('tr:eq('+i+') td'),function(){
 }
 });
 }
+//reating new properties set for update properties.
+var propertiesSet=JSON.stringify(tableDataJson);
 
-console.log("data is : "+JSON.stringify(tableDataJson));
+propertiesSet = propertiesSet.replace(/",/g, '\',');
+propertiesSet = propertiesSet.replace(/:"/g, ':\'');
+propertiesSet = propertiesSet.replace(/"/g, "");
+propertiesSet = propertiesSet.replace(/}/g, '\'}');
+
+alert("data is : "+JSON.stringify(tableDataJson));
 if(!tableDataJson.hasOwnProperty("Node Type")){
 			$.ajaxSetup({
     headers: {
         // Add authorization header in all ajax requests
-        "Authorization": "Basic bmVvNGo6T2NlYW4=" 
+        "Authorization": "Basic bmVvNGo6bmlzaGl0QDIz" 
     }
 });
 
@@ -194,7 +202,7 @@ $.ajax({
 			$.ajaxSetup({
     headers: {
         // Add authorization header in all ajax requests
-        "Authorization": "Basic bmVvNGo6T2NlYW4=" 
+        "Authorization": "Basic bmVvNGo6bmlzaGl0QDIz" 
     }
 });
 
@@ -226,4 +234,193 @@ createNode(tableDataJson["name"], neo4jNodeId, true,$('#nodeType').val());
 		
 	}
 
+}
+
+
+
+function getNewPropertiesForUpdate(tableDataJson){
+var relationshipType=$('#relationshipType').val();
+var tr = $('tr').length;
+for(var i=0; i < tr;i++){
+$.each($('tr:eq('+i+') td'),function(){
+	var tds = $('tr:eq('+i+') td');
+
+           var productId = $(tds).eq(0).text();
+		   var name = $(tds).eq(1).text();
+		   
+		   if(!tableDataJson.hasOwnProperty(productId)){
+			 if(productId=="Relationship Type"){
+				 tableDataJson[productId]=$('#relationshipType').val();
+			 }else{
+				 tableDataJson[productId]=name;
+			 }
+
+}
+});
+}
+//reating new properties set for update properties.
+var propertiesSet=JSON.stringify(tableDataJson);
+
+propertiesSet = propertiesSet.replace(/",/g, '\',');
+propertiesSet = propertiesSet.replace(/:"/g, ':\'');
+propertiesSet = propertiesSet.replace(/"/g, "");
+propertiesSet = propertiesSet.replace(/}/g, '\'}');
+propertiesSet = propertiesSet.replace(/''/g, '\'ggg\'');
+propertiesSet = propertiesSet.replace(/\s+/g,"");
+
+alert("data is : "+JSON.stringify(tableDataJson));
+
+return propertiesSet;
+}
+
+/*****************************************************************************
+ *	Function Name: updateNodeProperty(nodeQueryCriteria)
+ *	Description: This method will override the old properties set of a 
+				specific node with the new one.
+				nodeQueryCriteria - Based on this parameter query will be done 
+				to find a specific node to update the properties.
+ ****************************************************************************/
+function updateNodeProperty(nodeQueryCriteria){
+
+	var tableDataJson={};
+	var newPropertiesSet=getNewPropertiesForUpdate(tableDataJson);
+	var nodeCriteriaValue=tableDataJson[nodeQueryCriteria];
+
+	alert("MATCH (n { "+nodeQueryCriteria+": '"+nodeCriteriaValue+"' }) SET n = "+newPropertiesSet+" RETURN n");
+// Setup AJAX Header for authorization		
+$.ajaxSetup({
+    headers: {
+        // Add authorization header in all ajax requests
+        "Authorization": "Basic bmVvNGo6bmlzaGl0QDIz" 
+    }
+});
+
+ $.ajax({
+     type: "POST",
+    url: "http://localhost:7474/db/data/transaction/commit ",
+    dataType: "json",
+    contentType: "application/json;charset=UTF-8",
+	data: JSON.stringify({"statements":[{"statement":"MATCH (n { "+nodeQueryCriteria+": '"+nodeCriteriaValue+"' }) SET n = "+newPropertiesSet+" RETURN n"}]}),
+    success: function (data, textStatus, jqXHR) {
+        // use result data...
+		alert("Success text status is " + textStatus + " and data is " + JSON.stringify(data));
+
+    },
+    error: function (jqXHR, textStatus, errorThrown) {
+		alert("Error");
+    }
+});
+}
+
+
+/*****************************************************************************
+ *	Function Name: updateRelProperty(sourceNodeQueryCriteria,targetNodeQueryCriteria,neo4JID)
+ *	Description: This method will override the old properties set of a 
+				specific relationship with the new one.
+				sourceNodeQueryCriteria - This parameter contains the source node 
+				information for query of relationship.
+				targetNodeQueryCriteria - This parameter contains the target node 
+				information for query of relationship.
+			 
+ ****************************************************************************/
+function updateRelProperty(sourceNodeQueryCriteria,targetNodeQueryCriteria,neo4JID){
+	alert('1');
+	var tableDataJson={};
+	var newPropertiesSet=getNewPropertiesForUpdate(tableDataJson);
+
+$.ajaxSetup({
+    headers: {
+        // Add authorization header in all ajax requests
+        "Authorization": "Basic bmVvNGo6bmlzaGl0QDIz" 
+    }
+});
+
+ $.ajax({
+     type: "POST",
+    url: "http://localhost:7474/db/data/transaction/commit ",
+    dataType: "json",
+    contentType: "application/json;charset=UTF-8",
+	data: JSON.stringify({"statements":[{"statement":"MATCH (n) WHERE ID(n)="+tableDataJson[sourceNodeQueryCriteria]+" MATCH (m) WHERE ID(m)="+tableDataJson[targetNodeQueryCriteria]+" OPTIONAL MATCH (n)-[r:"+tableDataJson["Relationship Type"]+"]->(m) SET r="+newPropertiesSet+" RETURN r"}]}),
+    success: function (data, textStatus, jqXHR) {
+        // use result data...
+		alert("Success text status is " + textStatus + " and data is " + JSON.stringify(data));
+
+    },
+    error: function (jqXHR, textStatus, errorThrown) {
+		alert("Error");
+    }
+});
+}
+
+/*****************************************************************************
+ *	Function Name: deleteRelationship(sourceNodeQueryCriteria,targetNodeQueryCriteria,targetNodeCriteriaValue,neo4JID)
+ *	Description: This method will delete the relationship between queried source and target node.
+				sourceNodeQueryCriteria - This parameter contains the source node 
+				information for query of relationship for deletion.
+				targetNodeQueryCriteria - This parameter contains the target node 
+				information for query of relationship for deletion.
+			 
+ ****************************************************************************/
+function deleteRelationship(sourceNodeQueryCriteria,targetNodeQueryCriteria,targetNodeCriteriaValue,neo4JID){
+	//MATCH (n{name:'Test1'}) OPTIONAL MATCH (n)-[r]->() DELETE n,r
+	
+	var tableDataJson={};
+	var newPropertiesSet=getNewPropertiesForUpdate(tableDataJson);
+	
+	$.ajaxSetup({
+    headers: {
+        // Add authorization header in all ajax requests
+        "Authorization": "Basic bmVvNGo6bmlzaGl0QDIz" 
+    }
+});
+
+ $.ajax({
+     type: "POST",
+    url: "http://localhost:7474/db/data/transaction/commit ",
+    dataType: "json",
+    contentType: "application/json;charset=UTF-8",
+	data: JSON.stringify({"statements":[{"statement":"MATCH (n) WHERE ID(n)="+tableDataJson[sourceNodeQueryCriteria]+" MATCH (m) WHERE ID(m)="+tableDataJson[targetNodeQueryCriteria]+" OPTIONAL MATCH (n)-[r:"+tableDataJson["Relationship Type"]+"]->(m) DELETE r"}]}),
+    success: function (data, textStatus, jqXHR) {
+        // use result data...
+		alert("Success text status is " + textStatus + " and data is " + JSON.stringify(data));
+
+    },
+    error: function (jqXHR, textStatus, errorThrown) {
+		alert("Error");
+    }});
+}
+
+/*****************************************************************************
+ *	Function Name: deleteNode(nodeQueryCriteria)
+ *	Description: This method will delete a specific node and its associated relationships.
+				nodeQueryCriteria - Based on this parameter query will be done 
+				to find a specific node to delete.
+ ****************************************************************************/
+function deleteNode(nodeQueryCriteria){
+	//MATCH (n{name:'Test1'}) OPTIONAL MATCH (n)-[r]->() DELETE n,r
+	var tableDataJson={};
+	var newPropertiesSet=getNewPropertiesForUpdate(tableDataJson);
+	
+	$.ajaxSetup({
+    headers: {
+        // Add authorization header in all ajax requests
+        "Authorization": "Basic bmVvNGo6bmlzaGl0QDIz" 
+    }
+});
+
+ $.ajax({
+     type: "POST",
+    url: "http://localhost:7474/db/data/transaction/commit ",
+    dataType: "json",
+    contentType: "application/json;charset=UTF-8",
+	data: JSON.stringify({"statements":[{"statement":"MATCH (n { "+nodeQueryCriteria+": '"+tableDataJson[nodeQueryCriteria]+"' }) OPTIONAL MATCH (n)-[r]->() DELETE n,r"}]}),
+    success: function (data, textStatus, jqXHR) {
+        // use result data...
+		alert("Success text status is " + textStatus + " and data is " + JSON.stringify(data));
+
+    },
+    error: function (jqXHR, textStatus, errorThrown) {
+		alert("Error");
+    }
+});
 }

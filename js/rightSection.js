@@ -118,6 +118,13 @@ for(var myKey in selected_node) {
 $("#saveChanges").css('visibility', 'visible');
 $("#addProperty").css('visibility', 'visible');
 
+//Extra buttons for update and delete of nodes and relationships.
+$("#updateNodeProperty").css('visibility', 'visible');
+$("#updateRelProperty").css('visibility', 'visible');
+$("#deleteNode").css('visibility', 'visible');
+$("#deleteRelationship").css('visibility', 'visible');
+
+
     return table;
 }
 
@@ -222,6 +229,12 @@ $.each($('tr:eq('+i+') td'),function(){
 }			
 $("#saveChanges").css('visibility', 'visible');
 $("#addProperty").css('visibility', 'visible');
+
+//Extra buttons for update and delete of nodes and relationships.
+$("#updateNodeProperty").css('visibility', 'visible');
+$("#updateRelProperty").css('visibility', 'visible');
+$("#deleteNode").css('visibility', 'visible');
+$("#deleteRelationship").css('visibility', 'visible');
 
     return table;
 }

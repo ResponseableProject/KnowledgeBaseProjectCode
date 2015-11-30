@@ -71,7 +71,25 @@
 				<li> Query Path</li>
 				<input type="text" class="form-control" id="sourceNode" placeholder="Source Name">
 				<input type="text" class="form-control" id="targetNode" placeholder="Target Name">
+
+				
+		<select class="SelectLevel" id="SelectLevel">
+		 <option>All</option>
+            <option>5</option>
+            <option>10</option>
+            <option>50</option>
+        </select>
+		
+		<label><input type="radio" name="seaName" id="seaName" value="All">All</label> 
+		<label><input type="radio" name="seaName" id="seaName" value="Baltic">Baltic</label> 
+        <label><input type="radio" name="seaName" id="seaName" value="Med">Med</label>
+		<label><input type="radio" name="seaName" id="seaName" value="Atlantic">Atlantic</label> 
+        <label><input type="radio" name="seaName" id="seaName" value="Arctic">Arctic</label>
+	
+
 				<button onclick="highlightPath()" class="btn btn-primary">Highlight Path</button>
+				
+				<button onclick="queryPathBetweenTwoNodes()" class="btn btn-primary">Query Path with criteria</button>
 			</ul>
 			
 			<br><br><br>
@@ -107,6 +125,11 @@
 					<div class="button">
 						<button type="button" id="addProperty" class="btn btn-primary" onclick="addNewRow()" style="visibility:hidden">Add Property</button>
 						<button type="button" id="saveChanges" class="btn btn-primary" style="margin-left:20px;visibility:hidden" onclick="saveChanges()">Save Changes</button>
+						
+												<button type="button" id="updateNodeProperty" class="btn btn-primary" onclick="updateNodeProperty('nodeName')" style="visibility:hidden">Update Node Property</button>
+						<button type="button" id="updateRelProperty" class="btn btn-primary" onclick="updateRelProperty('source neo4jNodeId','target neo4jNodeId','ID')" style="visibility:hidden">Update Relationship Property</button>
+						<button type="button" id="deleteNode" class="btn btn-primary" style="margin-left:20px;visibility:hidden" onclick="deleteNode('nodeName')">Delete Node</button>
+						<button type="button" id="deleteRelationship" class="btn btn-primary" style="margin-left:20px;visibility:hidden" onclick="deleteRelationship('source neo4jNodeId','target neo4jNodeId','ID')">Delete Relationship</button>
 					</div>
                 </div>
                 <!--/col-span-6-->
