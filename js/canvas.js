@@ -797,6 +797,8 @@ function createRelationship()
 }
 
 //This method will query all the path between two nodes.
+//Each path is represented by one row in output.
+//In below example output two paths were found so two rows are there.
 //Success text status is success and data is {"results":[{"columns":["p"],"data":[{"row":[[{"title":"Tourism","name":"Tourism"},{"title":"PARENT","name":"PARENT"},{"title":"Quality","name":"Quality"}]]},{"row":[[{"title":"Tourism","name":"Tourism"},{"title":"CONTRIBUTES_TO","name":"CONTRIBUTES_TO"},{"title":"Coastal Debris","name":"Coastal Debris"},{"title":"IMPACTS","name":"IMPACTS"},{"title":"Quality","name":"Quality"}]]}]}],"errors":[]}
 
 function queryPathBetweenTwoNodes(){	
