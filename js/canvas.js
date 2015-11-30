@@ -799,4 +799,104 @@ function createRelationship()
 //This method will query all the path between two nodes.
 //Success text status is success and data is {"results":[{"columns":["p"],"data":[{"row":[[{"title":"Tourism","name":"Tourism"},{"title":"PARENT","name":"PARENT"},{"title":"Quality","name":"Quality"}]]},{"row":[[{"title":"Tourism","name":"Tourism"},{"title":"CONTRIBUTES_TO","name":"CONTRIBUTES_TO"},{"title":"Coastal Debris","name":"Coastal Debris"},{"title":"IMPACTS","name":"IMPACTS"},{"title":"Quality","name":"Quality"}]]}]}],"errors":[]}
 
+function queryPathBetweenTwoNodes(){	
+	
+	//Get the value from fields for query parameters.
+	var selectedLevel = $("#SelectLevel option:selected").val();	
+	var region = $("input[name='seaName']:checked").val();	
+	var sourceNodeName=$( sourceNode).val();
+	var targetNodeName=$( targetNode).val();
+		
+	$( sourceNode).val("");
+	$( targetNode).val("");
+
+	//Fade al the elements on canvas.
+	d3.selectAll(".node").style("opacity", 0.2);
+	d3.selectAll(".link").style("opacity", 0.2);	
+	
+	var nodesList=[];	
+	var relationshipList=[];	
+ 
+	//statements for query. If level is not All then first statement will excute to get the filtered value else later statement eill execute.
+	if(selectedLevel!="All"){
+		var statement="MATCH p=({name:"+"\""+sourceNodeName+"\""+"})-[*1.."+"\""+selectedLevel+"\""+"]->({name:"+"\""+targetNodeName+"\""+"})RETURN p"; 
+	
+	}else{
+		var statement="MATCH (n { name: "+"\""+sourceNodeName+"\""+"} ),(m { name: "+"\""+targetNodeName+"\""+"} ), p = (n)-[*]-(m) RETURN p";
+	 
+	}
+
+	// Setup AJAX Header for authorization	
+$.ajaxSetup({
+    headers: {
+        // Add authorization header in all ajax requests
+        "Authorization": "Basic bmVvNGo6bmlzaGl0QDIz" 
+    }
+});
+		
+ $.ajax({
+     type: "POST",
+    url: "http://localhost:7474/db/data/transaction/commit ",
+    dataType: "json",
+    contentType: "application/json;charset=UTF-8",
+	data: JSON.stringify({"statements":[{"statement":statement}]}),
+    success: function (data, textStatus, jqXHR) {
+        // use result data...
+		alert("Success text status is " + textStatus + " and data is " + JSON.stringify(data));
+			
+			//Parsing the output result.
+			for(var rowCount = 0; rowCount < data.results[0].data.length; rowCount++){
+				var pathDetail=data.results[0].data[rowCount].row[0];
+				for(var k=0;k<pathDetail.length;k++){
+					var eachElementInfo=pathDetail[k];
+					
+					//If some specific region is selected Ex - Baltic then it will filter out the result with specific values.
+					if(region!="All"){
+						if(eachElementInfo["region"]==region){
+							
+							//Push elements to node and relationship list.
+							if(eachElementInfo.hasOwnProperty("title")){
+							nodesList.push(eachElementInfo);
+							}else{
+							relationshipList.push(eachElementInfo);
+							}
+							
+						//Code to highlight the values on canvas on basis of query result.	
+						if(eachElementInfo.id!=undefined){
+						
+						var nodeId=parseInt(eachElementInfo.id);
+						var newid=nodeId+1;
+						 d3.select("#name"+newid).style("opacity",1);
+						}else{
+							d3.select("#link" +eachElementInfo.sourceid+eachElementInfo.targetid).style("opacity", 1);
+						}									
+						}
+					}else{
+						//Push elements to node and relationship list.
+						if(eachElementInfo.hasOwnProperty("title")){
+						nodesList.push(eachElementInfo);
+						}else{
+						relationshipList.push(eachElementInfo);
+					}
+					
+					//Code to highlight the values on canvas on basis of query result.	
+					if(eachElementInfo.id!=undefined){	
+						var nodeId=parseInt(eachElementInfo.id);
+						var newid=nodeId+1;
+						 d3.select("#name"+newid).style("opacity",1);
+					}else{
+						d3.select("#link" +eachElementInfo.sourceid+eachElementInfo.targetid).style("opacity", 1);
+					}										
+					}
+				}
+			}
+    },
+    error: function (jqXHR, textStatus, errorThrown) {
+		alert("Error");
+    }
+});	
+
+}
+
+
 
