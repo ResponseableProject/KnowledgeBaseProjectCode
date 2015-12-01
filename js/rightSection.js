@@ -135,6 +135,7 @@ $("#deleteRelationship").css('visibility', 'visible');
 function showPropertyWindowForRelationship(){
 		d3.select("table").remove(); 
 		$('#saveChanges').prop('disabled', false);
+		$('#addProperty').prop('disabled', false);
 	
 	var columns=["Property Name", "Property Value"];
 	var tableDataArray = new Array();
@@ -150,13 +151,12 @@ function showPropertyWindowForRelationship(){
 		var sourceOrTargetInfo=selected_link[myKey];
 		var sourceOrTargetNodeInfor=sourceOrTargetInfo['neo4jNodeId'];
 		
-		dataJson['Property Name']=myKey.trim()+" neo4jNodeId";
+		dataJson['Property Name']=myKey.trim()+"Neo4jNodeId";
 	    dataJson['Property Value']=sourceOrTargetInfo['neo4jNodeId'];
 	   
 		idJson['Property Name']=myKey.trim()+"id";
 	    idJson['Property Value']=sourceOrTargetInfo['id'];
-	   
-	   
+		
 		tableDataArray.push(dataJson);
 		tableDataArray.push(idJson);
 		}else{

@@ -66,7 +66,7 @@
 			<a href="#"><strong> </strong></a>
             <hr>
 			<button onclick="createNode('Node', 0, false,'Driver')" class="btn btn-primary">Create Node</button>
-			<br><br><br><br>
+			<br>
 			<ul class="nav nav-stacked collapse in" id="queryMenu">
 				<li> Query Path</li>
 				<input type="text" class="form-control" id="sourceNode" placeholder="Source Name">
@@ -92,14 +92,17 @@
 				<button onclick="queryPathBetweenTwoNodes()" class="btn btn-primary">Query Path with criteria</button>
 			</ul>
 			
-			<br><br><br>
+			<br>
 			
 			<ul class="nav nav-stacked collapse in" id="relationshipMenu">
-				<li>Create Causal Relationship</li>
+				<li>Causal Relationship</li>
 				<input type="text" class="form-control" id="relSourceNode" placeholder="Source Name">
 				<input type="text" class="form-control" id="relTargetNode" placeholder="Target Name">
 				<button onclick="createRelationship()" class="btn btn-primary">Create Relationship</button>
 			</ul>
+			
+			<button onclick="showGraphFromNeo4j()" class="btn btn-primary">Show Graph</button>
+			
         </div>
         <!-- /col-3 -->
         <div class="col-sm-10">

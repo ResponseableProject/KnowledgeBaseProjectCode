@@ -168,7 +168,7 @@ propertiesSet = propertiesSet.replace(/:"/g, ':\'');
 propertiesSet = propertiesSet.replace(/"/g, "");
 propertiesSet = propertiesSet.replace(/}/g, '\'}');
 
-alert("data is : "+JSON.stringify(tableDataJson));
+//alert("data is : "+JSON.stringify(tableDataJson));
 if(!tableDataJson.hasOwnProperty("Node Type")){
 			$.ajaxSetup({
     headers: {
@@ -182,9 +182,9 @@ var restServerURL = "http://localhost:7474/db/data";
 $.ajax({
     async: false,
     type: "POST",
-    url: restServerURL + "/node/"+tableDataJson['source neo4jNodeId']+"/relationships",
+    url: restServerURL + "/node/"+tableDataJson['sourceNeo4jNodeId']+"/relationships",
     dataType: "json",
-	data:JSON.stringify({to: "http://localhost:7474/db/data/node/"+tableDataJson['target neo4jNodeId'], type: relationshipType,data:tableDataJson}),
+	data:JSON.stringify({to: "http://localhost:7474/db/data/node/"+tableDataJson['targetNeo4jNodeId'], type: relationshipType,data:tableDataJson}),
     contentType: "application/json",
     success: function( data, xhr, textStatus ) {
          console.log("success"+data);
@@ -212,7 +212,6 @@ $.ajax({
 	tableDataJson["type"]="Driver";
 	
 $.ajax({
-	//Code added by Conor
 	async: false,
     type: "POST",
     url: restServerURL + "/node",
@@ -220,7 +219,6 @@ $.ajax({
     dataType: "json",
     contentType: "application/json",
     success: function( data, xhr, textStatus ) {
-		 //Code added by Conor
 		 neo4jNodeId = data.metadata.id;
     },
     error: function( xhr ) {
@@ -231,6 +229,30 @@ $.ajax({
 });
 nodes.pop();
 createNode(tableDataJson["name"], neo4jNodeId, true,$('#nodeType').val());
+
+		// Set the property neo4jNodeId in the database to the id returned from neo4j
+		$.ajaxSetup({
+			headers: {
+			// Add authorization header in all ajax requests
+			"Authorization": "Basic bmVvNGo6T2NlYW4=" 
+			}
+		});
+		
+		$.ajax({
+			type: "POST",
+			url: "http://localhost:7474/db/data/transaction/commit ",
+			dataType: "json",
+			contentType: "application/json;charset=UTF-8",
+			data: JSON.stringify({"statements": [{"statement": "START n=node(" + neo4jNodeId + ") SET n.neo4jNodeId = " + neo4jNodeId + " RETURN n"}]}),
+			success: function (data, textStatus, jqXHR) {
+				//alert("neo4jNodeId property successfully updated in database");
+			},
+			error: function (jqXHR, textStatus, errorThrown) {
+				// handle errors
+				alert("Error");
+			}
+		});
+
 		
 	}
 
@@ -286,7 +308,7 @@ function updateNodeProperty(nodeQueryCriteria){
 	var newPropertiesSet=getNewPropertiesForUpdate(tableDataJson);
 	var nodeCriteriaValue=tableDataJson[nodeQueryCriteria];
 
-	alert("MATCH (n { "+nodeQueryCriteria+": '"+nodeCriteriaValue+"' }) SET n = "+newPropertiesSet+" RETURN n");
+	//alert("MATCH (n { "+nodeQueryCriteria+": '"+nodeCriteriaValue+"' }) SET n = "+newPropertiesSet+" RETURN n");
 // Setup AJAX Header for authorization		
 $.ajaxSetup({
     headers: {
@@ -423,4 +445,107 @@ function deleteNode(nodeQueryCriteria){
 		alert("Error");
     }
 });
+}
+
+
+/*****************************************************************************
+ *	Function Name: showGraphFromNeo4j()
+ *	Description: Get data from neo4j for the complete graph and show it on the 
+ *	canvas. 
+ ****************************************************************************/
+function showGraphFromNeo4j()
+{
+	
+	// Setup AJAX Header for authorization		
+	$.ajaxSetup({
+		headers: {
+			// Add authorization header in all ajax requests
+			"Authorization": "Basic bmVvNGo6T2NlYW4=" 
+		}
+	});
+
+		$.ajax({
+		async: false,
+		type: "POST",
+		url: "http://localhost:7474/db/data/transaction/commit ",
+		dataType: "json",
+		contentType: "application/json;charset=UTF-8",
+		data: JSON.stringify({"statements": [{"statement": "MATCH (n) MATCH (m) OPTIONAL MATCH n-[r]->m RETURN n,r,m"}]}),
+		success: function (data, textStatus, jqXHR) {
+			
+			// Loop through the data and populate the nodes array
+			for(var rowCount = 0; rowCount < data.results[0].data.length; rowCount++)
+			{
+				var elementPath = data.results[0].data[rowCount].row;
+				
+				for(var elementCount = 0; elementCount < elementPath.length; elementCount++)
+				{
+					var elementInfo = elementPath[elementCount];
+					
+					if( (elementInfo != null) && (elementInfo.hasOwnProperty("nodeName")) )
+					{
+						//alert("Found Node");
+						// Check to ensure that node has not been added to the node array already
+						if(getNodeById(elementInfo.neo4jNodeId) == null)
+						{
+							// Push node into the node array
+							var node = {id: elementInfo.neo4jNodeId,
+										reflexive: false,
+										nodeName: elementInfo.name,
+										neo4jNodeId: elementInfo.neo4jNodeId };
+							
+							node.x = 100;
+							node.y = 100;
+							
+							nodes.push(node);
+						}
+					}
+				}
+			}
+			
+			var direction = 'right';
+			
+			// Loop through the data and populate the links array
+			for(var rowCount = 0; rowCount < data.results[0].data.length; rowCount++)
+			{
+				var elementPath = data.results[0].data[rowCount].row;
+				
+				for(var elementCount = 0; elementCount < elementPath.length; elementCount++)
+				{
+					var elementInfo = elementPath[elementCount];
+					
+					if( (elementInfo != null) && (!elementInfo.hasOwnProperty("nodeName")) )
+					{
+						// Create relationship
+						var sourceNode = getNodeById( elementInfo.sourceNeo4jNodeId );
+						var targetNode = getNodeById( elementInfo.targetNeo4jNodeId );
+						
+						var link = links.filter(function(l) {
+							return (l.source === sourceNode && l.target === targetNode);
+						})[0];
+						
+						if(link) {
+							link[direction] = true;
+						} else {
+							link = {source: sourceNode, 
+								target: targetNode, 
+								left: false, 
+								right: false, 
+								relType: elementInfo.relType };
+								
+							link[direction] = true;
+							links.push(link);
+						}
+					}
+				}
+			}
+						
+		},
+		error: function (jqXHR, textStatus, errorThrown) {
+			// handle errors
+			alert("Error");
+		}
+	});
+	
+	restart();	
 }

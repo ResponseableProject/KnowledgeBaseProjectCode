@@ -756,6 +756,27 @@ function getNodeByName(name)
 }
 
 /*****************************************************************************
+ *	Function Name: getNodeById()
+ *	Description: Search for a node Id on the canvas
+ ****************************************************************************/
+function getNodeById(id)
+{
+
+	var returnValue = null;
+	
+	for (var i=0;i<nodes.length;i++) 
+	{
+		if ( nodes[i].id == id )
+		{
+			returnValue = nodes[i];
+		}
+	}
+
+	return returnValue;
+	
+}
+
+/*****************************************************************************
  *	Function Name: createRelationship()
  *	Description: This method will create a causal relationship between two nodeSavedToDatabase
                  by inserting a new node and dividing one relationship to two
