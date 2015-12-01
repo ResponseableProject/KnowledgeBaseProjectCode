@@ -18,7 +18,7 @@ function getNodeData()
 $.ajaxSetup({
     headers: {
         // Add authorization header in all ajax requests
-        "Authorization": "Basic bmVvNGo6bmlzaGl0QDIz" 
+        "Authorization": "Basic bmVvNGo6T2NlYW4=" 
     }
 });
 
@@ -50,7 +50,7 @@ function showNodeFromNeo4j()
 $.ajaxSetup({
     headers: {
         // Add authorization header in all ajax requests
-        "Authorization": "Basic bmVvNGo6bmlzaGl0QDIz" 
+        "Authorization": "Basic bmVvNGo6T2NlYW4=" 
     }
 });
 
@@ -97,7 +97,7 @@ function showTwoNodes()
 $.ajaxSetup({
     headers: {
         // Add authorization header in all ajax requests
-        "Authorization": "Basic bmVvNGo6bmlzaGl0QDIz" 
+        "Authorization": "Basic bmVvNGo6T2NlYW4=" 
     }
 });
 
@@ -136,7 +136,7 @@ $.ajax({
  *	Description: Create a node in Neo4j
  ****************************************************************************/
 function saveChanges(){
-	alert('12');
+	//alert('12');
 	//getNewPropertiesForUpdate();
 	$('#saveChanges').prop('disabled', true);
 
@@ -173,7 +173,7 @@ if(!tableDataJson.hasOwnProperty("Node Type")){
 			$.ajaxSetup({
     headers: {
         // Add authorization header in all ajax requests
-        "Authorization": "Basic bmVvNGo6bmlzaGl0QDIz" 
+        "Authorization": "Basic bmVvNGo6T2NlYW4=" 
     }
 });
 
@@ -202,7 +202,7 @@ $.ajax({
 			$.ajaxSetup({
     headers: {
         // Add authorization header in all ajax requests
-        "Authorization": "Basic bmVvNGo6bmlzaGl0QDIz" 
+        "Authorization": "Basic bmVvNGo6T2NlYW4=" 
     }
 });
 
@@ -268,7 +268,7 @@ propertiesSet = propertiesSet.replace(/}/g, '\'}');
 propertiesSet = propertiesSet.replace(/''/g, '\'ggg\'');
 propertiesSet = propertiesSet.replace(/\s+/g,"");
 
-alert("data is : "+JSON.stringify(tableDataJson));
+//alert("data is : "+JSON.stringify(tableDataJson));
 
 return propertiesSet;
 }
@@ -291,7 +291,7 @@ function updateNodeProperty(nodeQueryCriteria){
 $.ajaxSetup({
     headers: {
         // Add authorization header in all ajax requests
-        "Authorization": "Basic bmVvNGo6bmlzaGl0QDIz" 
+        "Authorization": "Basic bmVvNGo6T2NlYW4=" 
     }
 });
 
@@ -303,7 +303,7 @@ $.ajaxSetup({
 	data: JSON.stringify({"statements":[{"statement":"MATCH (n { "+nodeQueryCriteria+": '"+nodeCriteriaValue+"' }) SET n = "+newPropertiesSet+" RETURN n"}]}),
     success: function (data, textStatus, jqXHR) {
         // use result data...
-		alert("Success text status is " + textStatus + " and data is " + JSON.stringify(data));
+		//alert("Success text status is " + textStatus + " and data is " + JSON.stringify(data));
 
     },
     error: function (jqXHR, textStatus, errorThrown) {
@@ -331,7 +331,7 @@ function updateRelProperty(sourceNodeQueryCriteria,targetNodeQueryCriteria,neo4J
 $.ajaxSetup({
     headers: {
         // Add authorization header in all ajax requests
-        "Authorization": "Basic bmVvNGo6bmlzaGl0QDIz" 
+        "Authorization": "Basic bmVvNGo6T2NlYW4=" 
     }
 });
 
@@ -343,7 +343,7 @@ $.ajaxSetup({
 	data: JSON.stringify({"statements":[{"statement":"MATCH (n) WHERE ID(n)="+tableDataJson[sourceNodeQueryCriteria]+" MATCH (m) WHERE ID(m)="+tableDataJson[targetNodeQueryCriteria]+" OPTIONAL MATCH (n)-[r:"+tableDataJson["Relationship Type"]+"]->(m) SET r="+newPropertiesSet+" RETURN r"}]}),
     success: function (data, textStatus, jqXHR) {
         // use result data...
-		alert("Success text status is " + textStatus + " and data is " + JSON.stringify(data));
+		//alert("Success text status is " + textStatus + " and data is " + JSON.stringify(data));
 
     },
     error: function (jqXHR, textStatus, errorThrown) {
@@ -370,7 +370,7 @@ function deleteRelationship(sourceNodeQueryCriteria,targetNodeQueryCriteria,targ
 	$.ajaxSetup({
     headers: {
         // Add authorization header in all ajax requests
-        "Authorization": "Basic bmVvNGo6bmlzaGl0QDIz" 
+        "Authorization": "Basic bmVvNGo6T2NlYW4=" 
     }
 });
 
@@ -382,7 +382,7 @@ function deleteRelationship(sourceNodeQueryCriteria,targetNodeQueryCriteria,targ
 	data: JSON.stringify({"statements":[{"statement":"MATCH (n) WHERE ID(n)="+tableDataJson[sourceNodeQueryCriteria]+" MATCH (m) WHERE ID(m)="+tableDataJson[targetNodeQueryCriteria]+" OPTIONAL MATCH (n)-[r:"+tableDataJson["Relationship Type"]+"]->(m) DELETE r"}]}),
     success: function (data, textStatus, jqXHR) {
         // use result data...
-		alert("Success text status is " + textStatus + " and data is " + JSON.stringify(data));
+		//alert("Success text status is " + textStatus + " and data is " + JSON.stringify(data));
 
     },
     error: function (jqXHR, textStatus, errorThrown) {
@@ -404,7 +404,7 @@ function deleteNode(nodeQueryCriteria){
 	$.ajaxSetup({
     headers: {
         // Add authorization header in all ajax requests
-        "Authorization": "Basic bmVvNGo6bmlzaGl0QDIz" 
+        "Authorization": "Basic bmVvNGo6T2NlYW4=" 
     }
 });
 
@@ -416,7 +416,7 @@ function deleteNode(nodeQueryCriteria){
 	data: JSON.stringify({"statements":[{"statement":"MATCH (n { "+nodeQueryCriteria+": '"+tableDataJson[nodeQueryCriteria]+"' }) OPTIONAL MATCH (n)-[r]->() DELETE n,r"}]}),
     success: function (data, textStatus, jqXHR) {
         // use result data...
-		alert("Success text status is " + textStatus + " and data is " + JSON.stringify(data));
+		//alert("Success text status is " + textStatus + " and data is " + JSON.stringify(data));
 
     },
     error: function (jqXHR, textStatus, errorThrown) {

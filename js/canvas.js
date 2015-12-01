@@ -669,7 +669,7 @@ function highlightPath() {
 $.ajaxSetup({
     headers: {
         // Add authorization header in all ajax requests
-        "Authorization": "Basic bmVvNGo6bmlzaGl0QDIz" 
+        "Authorization": "Basic bmVvNGo6T2NlYW4=" 
     }
 });
 		
@@ -832,7 +832,7 @@ function queryPathBetweenTwoNodes(){
 $.ajaxSetup({
     headers: {
         // Add authorization header in all ajax requests
-        "Authorization": "Basic bmVvNGo6bmlzaGl0QDIz" 
+        "Authorization": "Basic bmVvNGo6T2NlYW4=" 
     }
 });
 		
