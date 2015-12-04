@@ -7,8 +7,8 @@
 /*****************************************************************************
  *	Global Variables
  ****************************************************************************/
-var hiddenDefaultPropertyNode=({"reflexive":"reflexive","neo4jNodeId":"neo4jNodeId","x":"x","y":"y","index":"index","weight":"weight","px":"px","py":"py","Node Type":"Node Type"});
-var hiddenDefaultPropertyNodeDocument=({"reflexive":"reflexive","neo4jNodeId":"neo4jNodeId","x":"x","y":"y","index":"index","weight":"weight","px":"px","py":"py","Node Type":"Node Type","nodeSavedToDatabase":"nodeSavedToDatabase","fixed":"fixed","nodeName":"nodeName",});
+var hiddenDefaultPropertyNode=({"reflexive":"reflexive","neo4jNodeId":"neo4jNodeId","x":"x","y":"y","index":"index","weight":"weight","px":"px","py":"py"});
+var hiddenDefaultPropertyNodeDocument=({"reflexive":"reflexive","neo4jNodeId":"neo4jNodeId","x":"x","y":"y","index":"index","weight":"weight","px":"px","py":"py","nodeSavedToDatabase":"nodeSavedToDatabase","fixed":"fixed","nodeName":"nodeName"});
 var hiddenDefaultPropertyRelation=({"left":"left","right":"right"});
 var data = new Array();
 var defaultData = ({"key":"ttt","value":"ttt","uri":data.self});
@@ -267,7 +267,7 @@ var drag = force.stop().drag()
 		}
 		
 	})
-	.attr('id', function(d){ return 'name' + d.id; })
+	.attr('id', function(d){ return 'nodeName' + d.id; })
 	.style('fill', function(d) 
 		{
 			// Changing code from using ternary operator to if statement
@@ -663,7 +663,7 @@ function highlightPath() {
 		d3.selectAll(".link").style("opacity", 0.2);
 
 		
-		var statements="MATCH p=({name:"+"\""+sourceNodeName+"\""+"})-[:Other*1..5]->({name:"+"\""+targetNodeName+"\""+"})RETURN p";
+		var statements="MATCH p=({nodeName:"+"\""+sourceNodeName+"\""+"})-[:Other*1..5]->({nodeName:"+"\""+targetNodeName+"\""+"})RETURN p";
 
 		// Setup AJAX Header for authorization		
 $.ajaxSetup({
@@ -678,7 +678,7 @@ $.ajaxSetup({
     url: "http://localhost:7474/db/data/transaction/commit ",
     dataType: "json",
     contentType: "application/json;charset=UTF-8",
-	data: JSON.stringify({"statements":[{"statement":"MATCH p=({name:"+"\""+sourceNodeName+"\""+"})-[:Other*1..5]->({name:"+"\""+targetNodeName+"\""+"})RETURN p"}]}),
+	data: JSON.stringify({"statements":[{"statement":"MATCH p=({nodeName:"+"\""+sourceNodeName+"\""+"})-[:Other*1..5]->({nodeName:"+"\""+targetNodeName+"\""+"})RETURN p"}]}),
     success: function (data, textStatus, jqXHR) {
         // use result data...
 		            data.results[0].data[0].row[0].forEach(function (n) {
@@ -687,7 +687,7 @@ $.ajaxSetup({
 						
 						var nodeId=parseInt(n.id);
 						var newid=nodeId+1;
-						 d3.select("#name"+newid).style("opacity",1);
+						 d3.select("#nodeName"+newid).style("opacity",1);
 					}else{
 						d3.select("#link" +n.sourceid+n.targetid).style("opacity", 1);
 					}
@@ -817,109 +817,7 @@ function createRelationship()
 	
 }
 
-//This method will query all the path between two nodes.
-//Each path is represented by one row in output.
-//In below example output two paths were found so two rows are there.
-//Success text status is success and data is {"results":[{"columns":["p"],"data":[{"row":[[{"title":"Tourism","name":"Tourism"},{"title":"PARENT","name":"PARENT"},{"title":"Quality","name":"Quality"}]]},{"row":[[{"title":"Tourism","name":"Tourism"},{"title":"CONTRIBUTES_TO","name":"CONTRIBUTES_TO"},{"title":"Coastal Debris","name":"Coastal Debris"},{"title":"IMPACTS","name":"IMPACTS"},{"title":"Quality","name":"Quality"}]]}]}],"errors":[]}
 
-function queryPathBetweenTwoNodes(){	
-	
-	//Get the value from fields for query parameters.
-	var selectedLevel = $("#SelectLevel option:selected").val();	
-	var region = $("input[name='seaName']:checked").val();	
-	var sourceNodeName=$( sourceNode).val();
-	var targetNodeName=$( targetNode).val();
-		
-	$( sourceNode).val("");
-	$( targetNode).val("");
-
-	//Fade al the elements on canvas.
-	d3.selectAll(".node").style("opacity", 0.2);
-	d3.selectAll(".link").style("opacity", 0.2);	
-	
-	var nodesList=[];	
-	var relationshipList=[];	
- 
-	//statements for query. If level is not All then first statement will excute to get the filtered value else later statement eill execute.
-	if(selectedLevel!="All"){
-		var statement="MATCH p=({name:"+"\""+sourceNodeName+"\""+"})-[*1.."+"\""+selectedLevel+"\""+"]->({name:"+"\""+targetNodeName+"\""+"})RETURN p"; 
-	
-	}else{
-		var statement="MATCH (n { name: "+"\""+sourceNodeName+"\""+"} ),(m { name: "+"\""+targetNodeName+"\""+"} ), p = (n)-[*]-(m) RETURN p";
-	 
-	}
-
-	// Setup AJAX Header for authorization	
-$.ajaxSetup({
-    headers: {
-        // Add authorization header in all ajax requests
-        "Authorization": "Basic bmVvNGo6T2NlYW4=" 
-    }
-});
-		
- $.ajax({
-     type: "POST",
-    url: "http://localhost:7474/db/data/transaction/commit ",
-    dataType: "json",
-    contentType: "application/json;charset=UTF-8",
-	data: JSON.stringify({"statements":[{"statement":statement}]}),
-    success: function (data, textStatus, jqXHR) {
-        // use result data...
-		alert("Success text status is " + textStatus + " and data is " + JSON.stringify(data));
-			
-			//Parsing the output result.
-			for(var rowCount = 0; rowCount < data.results[0].data.length; rowCount++){
-				var pathDetail=data.results[0].data[rowCount].row[0];
-				for(var k=0;k<pathDetail.length;k++){
-					var eachElementInfo=pathDetail[k];
-					
-					//If some specific region is selected Ex - Baltic then it will filter out the result with specific values.
-					if(region!="All"){
-						if(eachElementInfo["region"]==region){
-							
-							//Push elements to node and relationship list.
-							if(eachElementInfo.hasOwnProperty("title")){
-							nodesList.push(eachElementInfo);
-							}else{
-							relationshipList.push(eachElementInfo);
-							}
-							
-						//Code to highlight the values on canvas on basis of query result.	
-						if(eachElementInfo.id!=undefined){
-						
-						var nodeId=parseInt(eachElementInfo.id);
-						var newid=nodeId+1;
-						 d3.select("#name"+newid).style("opacity",1);
-						}else{
-							d3.select("#link" +eachElementInfo.sourceid+eachElementInfo.targetid).style("opacity", 1);
-						}									
-						}
-					}else{
-						//Push elements to node and relationship list.
-						if(eachElementInfo.hasOwnProperty("title")){
-						nodesList.push(eachElementInfo);
-						}else{
-						relationshipList.push(eachElementInfo);
-					}
-					
-					//Code to highlight the values on canvas on basis of query result.	
-					if(eachElementInfo.id!=undefined){	
-						var nodeId=parseInt(eachElementInfo.id);
-						var newid=nodeId+1;
-						 d3.select("#name"+newid).style("opacity",1);
-					}else{
-						d3.select("#link" +eachElementInfo.sourceid+eachElementInfo.targetid).style("opacity", 1);
-					}										
-					}
-				}
-			}
-    },
-    error: function (jqXHR, textStatus, errorThrown) {
-		alert("Error");
-    }
-});	
-
-}
 
 
 

@@ -11,31 +11,24 @@
  *	Description: Show the property window for nodes in right panel.
  ****************************************************************************/
 function showPropertyWindow(){
-
+	//This code is to render new table and remove old one.
 	d3.select("table").remove();
+	//Make Save Changes button active.
 	$('#saveChanges').prop('disabled', false);
+	//This variable contains the header values of table.
 	var columns=["Property Name", "Property Value"];
+	//It contains all data of properties table into an array.
 	var tableDataArray = new Array();
+	
+	//Pushing all the properties into array,
+	for(var myKey in selected_node) {
+	   var dataJson={};
+	   dataJson['Property Name']=myKey;
+	   dataJson['Property Value']=selected_node[myKey];
+	   tableDataArray.push(dataJson);
+	}
 
-for(var myKey in selected_node) {
-   var dataJson={};
-   dataJson['Property Name']=myKey;
-   dataJson['Property Value']=selected_node[myKey];
-   tableDataArray.push(dataJson);
-}
-
-//Add Node Type into the Property Window
-   var dataJson={};
-   dataJson['Property Name']="Node Type";
-   dataJson['Property Value']=$('#nodeType').val();
-   tableDataArray.push(dataJson);
-   
-   //Add Node Type into the Property Window
-   var dataJsonm={};
-   dataJsonm['Property Name']="name";
-   dataJsonm['Property Value']=selected_node["nodeName"];
-   tableDataArray.push(dataJsonm);
-
+     //Creating properties table.
     var table = d3.select("#table-responsive").append("table")
 			.attr('class', 'table table-striped'),
         thead = table.append("thead"),
@@ -81,16 +74,14 @@ for(var myKey in selected_node) {
 			});
 			
 			
-			//Document Type Node
+			//Creating extra rows for Document Type Node
 			if(selected_node.hasOwnProperty("DocumentType")){
 				 
-				 						$("tr:last").before("<tr><td class=cell style=font-family:Courier contenteditable=true>DocumentURL</td><td  > <a href=http://water.epa.gov/type/oceb/marinedebris/factsheet_marinedebris_debris.cfm target=_blank>Open Document URL</a></td><td onclick=deleteRow()><img src=https://cdn2.iconfinder.com/data/icons/aspneticons_v1.0_Nov2006/delete_16x16.gif alt=Smiley face></td></tr>");
+				 	$("tr:last").before("<tr><td class=cell style=font-family:Courier contenteditable=true>DocumentURL</td><td  > <a href=http://water.epa.gov/type/oceb/marinedebris/factsheet_marinedebris_debris.cfm target=_blank>Open Document URL</a></td><td onclick=deleteRow()><img src=https://cdn2.iconfinder.com/data/icons/aspneticons_v1.0_Nov2006/delete_16x16.gif alt=Smiley face></td></tr>");
 				
 			}
-			
-			
-			
-			//Hide rows for relationship.
+						
+		//Hiding unwanted properties from the properties windows and displaying only default properties.
 		var tr = $('tr').length;
 		var tableDataJson={};
 		for(var i=0; i < tr;i++){
@@ -104,7 +95,7 @@ for(var myKey in selected_node) {
 		    if(selected_node.hasOwnProperty("DocumentType")){	   
 			    if(hiddenDefaultPropertyNodeDocument.hasOwnProperty(productId)){
 			    $('tr:eq('+i+')').hide();
-		   }
+		   }//For all other node types.
 		   }else{
 			    if(hiddenDefaultPropertyNode.hasOwnProperty(productId)){
 			    $('tr:eq('+i+')').hide();
@@ -114,11 +105,9 @@ for(var myKey in selected_node) {
 
 });
 }
-
+//Making all the buttons visible only when properties window is open.
 $("#saveChanges").css('visibility', 'visible');
 $("#addProperty").css('visibility', 'visible');
-
-//Extra buttons for update and delete of nodes and relationships.
 $("#updateNodeProperty").css('visibility', 'visible');
 $("#updateRelProperty").css('visibility', 'visible');
 $("#deleteNode").css('visibility', 'visible');
@@ -133,21 +122,27 @@ $("#deleteRelationship").css('visibility', 'visible');
  *	Description: Show the property window for a relationship
  ****************************************************************************/
 function showPropertyWindowForRelationship(){
+		//This code is to render new table and remove old one.
 		d3.select("table").remove(); 
+		
+		//Make buttons active.
 		$('#saveChanges').prop('disabled', false);
 		$('#addProperty').prop('disabled', false);
 	
+	//This variable contains the header values of table.
 	var columns=["Property Name", "Property Value"];
+	//It contains all data of properties table into an array.
 	var tableDataArray = new Array();
-	var sourceData=selected_link["source"];
-	var targetData=selected_link["target"];
 
+	//Pushing link properties values to the array.
 	for(var myKey in selected_link) {
   
+		//Adding Neo4j source and target Neo4J Node ids to the properties of relationship.
+		//Needs improvement on using multiple keys for the same property.
 		if(myKey=="source" || myKey=="target"){
 		 var dataJson={};
 		 var idJson={};
-		
+	
 		var sourceOrTargetInfo=selected_link[myKey];
 		var sourceOrTargetNodeInfor=sourceOrTargetInfo['neo4jNodeId'];
 		
@@ -167,8 +162,8 @@ function showPropertyWindowForRelationship(){
 		}
 	}
 
-    var table = d3.select("#table-responsive").append("table")
-          
+	   //Creating properties table.
+		var table = d3.select("#table-responsive").append("table") 
 		   .attr('class', 'table table-striped'),
         thead = table.append("thead"),
         tbody = table.append("tbody");
@@ -210,11 +205,11 @@ function showPropertyWindowForRelationship(){
 				$(this).parent("tr").remove();
 			});
 		
-				
+			//Adding extra row for Relationship Type property.	
 			$("tr:first").after("<tr><td class=cell style=font-family:Courier contenteditable=true>Relationship Type</td><td> <select class=form-control id=relationshipType><option id=Other>Other</option></select></td><td onclick=deleteRow()><img src=https://cdn2.iconfinder.com/data/icons/aspneticons_v1.0_Nov2006/delete_16x16.gif alt=Smiley face></td></tr>");
 
 				
-//Hide rows for relationship.
+//Hiding unwanted properties from the properties window and displaying only default properties.
 var tr = $('tr').length;
 var tableDataJson={};
 for(var i=0; i < tr;i++){
@@ -226,11 +221,11 @@ $.each($('tr:eq('+i+') td'),function(){
 			    $('tr:eq('+i+')').hide();
 		   }
 });
-}			
+}
+
+//Making all the buttons visible only when properties window is open.			
 $("#saveChanges").css('visibility', 'visible');
 $("#addProperty").css('visibility', 'visible');
-
-//Extra buttons for update and delete of nodes and relationships.
 $("#updateNodeProperty").css('visibility', 'visible');
 $("#updateRelProperty").css('visibility', 'visible');
 $("#deleteNode").css('visibility', 'visible');
@@ -241,7 +236,7 @@ $("#deleteRelationship").css('visibility', 'visible');
 
 /*****************************************************************************
  *	Function Name: addNewRow()
- *	Description: Add a new row to the property window
+ *	Description: Add a new row to the property window on click of Add Property button.
  ****************************************************************************/
 function addNewRow(){
 	$("tr:last").after("<tr><td class=cell style=font-family:Courier contenteditable=true></td><td class=cell style=font-family:Courier contenteditable=true></td><td onclick=deleteRow()><img src=https://cdn2.iconfinder.com/data/icons/aspneticons_v1.0_Nov2006/delete_16x16.gif alt=Smiley face></td></tr>");
@@ -249,7 +244,7 @@ function addNewRow(){
 
 /*****************************************************************************
  *	Function Name: deleteRow()
- *	Description: Delete a row from the property window
+ *	Description: Delete a row from the property window on click of cross sign.
  ****************************************************************************/
 function deleteRow(){
 	$("tr:last").remove();

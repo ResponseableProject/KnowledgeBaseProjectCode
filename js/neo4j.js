@@ -6,238 +6,116 @@
  *	Creating, Reading, Updating and Deleting.
  *
  ****************************************************************************/
- 
- /*****************************************************************************
- *	Function Name: getNodeData()
- *	Description: Get node data from neo4j
- ****************************************************************************/
-function getNodeData()
-{
-	
-// Setup AJAX Header for authorization		
-$.ajaxSetup({
-    headers: {
-        // Add authorization header in all ajax requests
-        "Authorization": "Basic bmVvNGo6T2NlYW4=" 
-    }
-});
-
-$.ajax({
-    type: "POST",
-    url: "http://localhost:7474/db/data/transaction/commit ",
-    dataType: "json",
-    contentType: "application/json;charset=UTF-8",
-	data: JSON.stringify({"statements": [{"statement": "MATCH (n { name: 'Tourism' }) RETURN n"}]}),
-    success: function (data, textStatus, jqXHR) {
-		$(".neo4jResponse").html(JSON.stringify(data));
-    },
-    error: function (jqXHR, textStatus, errorThrown) {
-        // handle errors
-		alert("Error");
-    }
-});
-	
-}
-
-/*****************************************************************************
- *	Function Name: showNodeFromNeo4j()
- *	Description: Get node data from neo4j and show it on the canvas
- ****************************************************************************/
-function showNodeFromNeo4j()
-{
-
-// Setup AJAX Header for authorization		
-$.ajaxSetup({
-    headers: {
-        // Add authorization header in all ajax requests
-        "Authorization": "Basic bmVvNGo6T2NlYW4=" 
-    }
-});
-
-$.ajax({
-	async: false,
-    type: "POST",
-    url: "http://localhost:7474/db/data/transaction/commit ",
-    dataType: "json",
-    contentType: "application/json;charset=UTF-8",
-	data: JSON.stringify({"statements": [{"statement": "MATCH (n { name: 'Quality' }) RETURN n"}]}),
-    success: function (data, textStatus, jqXHR) {
-        // use result data...
-		nodeNameValue = data.results[0].data[0].row[0].name;
-		nodeTitleValue = data.results[0].data[0].row[0].title;
-    },
-    error: function (jqXHR, textStatus, errorThrown) {
-        // handle errors
-		alert("Error");
-    }
-});
-
-	// because :active only works in WebKit?
-	svg.classed('active', true);
-	
-	  var node = {id: ++lastNodeId, reflexive: false, nodeName: nodeNameValue, nodeTitle: nodeTitleValue };
-	node.x = 100;
-	node.y = 100;
-  
-	nodes.push(node);
-
-	restart();
-
-
-}
-
-/*****************************************************************************
- *	Function Name: showTwoNodes()
- *	Description: Get data from neo4j for two nodes and show them on the canvas
- ****************************************************************************/
-function showTwoNodes()
-{
-
-// Setup AJAX Header for authorization		
-$.ajaxSetup({
-    headers: {
-        // Add authorization header in all ajax requests
-        "Authorization": "Basic bmVvNGo6T2NlYW4=" 
-    }
-});
-
-$.ajax({
-	async: false,
-    type: "POST",
-    url: "http://localhost:7474/db/data/transaction/commit ",
-    dataType: "json",
-    contentType: "application/json;charset=UTF-8",
-	data: JSON.stringify({"statements": [{"statement": "MATCH ( n:CoastalDebris ) RETURN n"}]}),
-    success: function (data, textStatus, jqXHR) {
-		
-		// Parse the JSON object returned from neo4j
-		for (var i = 0; i < data.results[0].data.length; i++) 
-		{
-			var node = {id: ++lastNodeId, 
-						reflexive: false, 
-						nodeName: data.results[0].data[i].row[0].name, 
-						nodeTitle: data.results[0].data[i].row[0].title };
-			node.x = 100;
-			node.y = 100;
-  
-			nodes.push(node);
-		}
-    },
-    error: function (jqXHR, textStatus, errorThrown) {
-        // handle errors
-		alert("Error");
-    }
-});
-	restart();
-}
 
 /*****************************************************************************
  *	Function Name: saveChanges()
- *	Description: Create a node in Neo4j
+ *	Description: Create a node/relationship in Neo4j
  ****************************************************************************/
 function saveChanges(){
-	//alert('12');
-	//getNewPropertiesForUpdate();
+
+	//Disable button on click.
 	$('#saveChanges').prop('disabled', true);
+	//Get relationship type value.
+	var relationshipType=$('#relationshipType').val();
 
-var relationshipType=$('#relationshipType').val();
-var tr = $('tr').length;
-var tableDataJson={};
-for(var i=0; i < tr;i++){
-$.each($('tr:eq('+i+') td'),function(){
-	var tds = $('tr:eq('+i+') td');
+	//Get table data in Json format.
+	var tr = $('tr').length;
+	var tableDataJson={};
+	for(var i=0; i < tr;i++){
+	$.each($('tr:eq('+i+') td'),function(){
+		var tds = $('tr:eq('+i+') td');
 
-           var productId = $(tds).eq(0).text();
-		   var name = $(tds).eq(1).text();
-		   
-		   if(!tableDataJson.hasOwnProperty(productId)){
-			 if(productId=="Relationship Type"){
-				 tableDataJson[productId]=$('#relationshipType').val();
-			 }else{
-				 tableDataJson[productId]=name;
-			 }
+			   var productId = $(tds).eq(0).text();
+			   var name = $(tds).eq(1).text();
+			   
+			   if(!tableDataJson.hasOwnProperty(productId)){
+				 if(productId=="Relationship Type"){
+					 tableDataJson[productId]=$('#relationshipType').val();
+				 }else{
+					 tableDataJson[productId]=name;
+				 }
 
-}
-});
-}
-//reating new properties set for update properties.
-var propertiesSet=JSON.stringify(tableDataJson);
+	}
+	});
+	}
 
-propertiesSet = propertiesSet.replace(/",/g, '\',');
-propertiesSet = propertiesSet.replace(/:"/g, ':\'');
-propertiesSet = propertiesSet.replace(/"/g, "");
-propertiesSet = propertiesSet.replace(/}/g, '\'}');
-
-//alert("data is : "+JSON.stringify(tableDataJson));
-if(!tableDataJson.hasOwnProperty("Node Type")){
-			$.ajaxSetup({
-    headers: {
-        // Add authorization header in all ajax requests
-        "Authorization": "Basic bmVvNGo6T2NlYW4=" 
-    }
-});
-
-//Query the last generated id
-var restServerURL = "http://localhost:7474/db/data";
-$.ajax({
-    async: false,
-    type: "POST",
-    url: restServerURL + "/node/"+tableDataJson['sourceNeo4jNodeId']+"/relationships",
-    dataType: "json",
-	data:JSON.stringify({to: "http://localhost:7474/db/data/node/"+tableDataJson['targetNeo4jNodeId'], type: relationshipType,data:tableDataJson}),
-    contentType: "application/json",
-    success: function( data, xhr, textStatus ) {
-         console.log("success"+data);
-    },
-    error: function(  data, xhr, textStatus ) {
-        window.console && console.log( xhr );
-		console.log("data is "+JSON.stringify(data)+"textStatus is "+textStatus+" and xhr is "+xhr);
-        console.log("error");
-    },
-    complete: function() {
-        console.log("complete function");   
-    }
-});
-	}else{
-			$.ajaxSetup({
-    headers: {
-        // Add authorization header in all ajax requests
-        "Authorization": "Basic bmVvNGo6T2NlYW4=" 
-    }
-});
-
-//Query the last generated id
-	var restServerURL = "http://localhost:7474/db/data";
-	tableDataJson["uri"]=data.self;
-	tableDataJson["type"]="Driver";
-	
-$.ajax({
-	async: false,
-    type: "POST",
-    url: restServerURL + "/node",
-    data: JSON.stringify(tableDataJson),
-    dataType: "json",
-    contentType: "application/json",
-    success: function( data, xhr, textStatus ) {
-		 neo4jNodeId = data.metadata.id;
-    },
-    error: function( xhr ) {
-        window.console && console.log( xhr );
-    },
-    complete: function() {
-    }
-});
-nodes.pop();
-createNode(tableDataJson["name"], neo4jNodeId, true,$('#nodeType').val());
-
-		// Set the property neo4jNodeId in the database to the id returned from neo4j
-		$.ajaxSetup({
-			headers: {
+	//Ajax authentication request for saving relationship to Neo4j.
+	if(!tableDataJson.hasOwnProperty("nodeType")){
+				$.ajaxSetup({
+		headers: {
 			// Add authorization header in all ajax requests
+			"Authorization": "Basic bmVvNGo6T2NlYW4=" 
+		}
+	});
+
+	//Ajax request for saving relationship to Neo4j.
+	//Passing source Neo4j Id in url and target Neo4j Id in data for creating relationship.
+	var restServerURL = "http://localhost:7474/db/data";
+	$.ajax({
+		async: false,
+		type: "POST",
+		url: restServerURL + "/node/"+tableDataJson['sourceNeo4jNodeId']+"/relationships",
+		dataType: "json",
+		data:JSON.stringify({to: "http://localhost:7474/db/data/node/"+tableDataJson['targetNeo4jNodeId'], type: relationshipType,data:tableDataJson}),
+		contentType: "application/json",
+		success: function( data, xhr, textStatus ) {
+			 console.log("success"+data);
+		},
+		error: function(  data, xhr, textStatus ) {
+			window.console && console.log( xhr );
+			console.log("data is "+JSON.stringify(data)+"textStatus is "+textStatus+" and xhr is "+xhr);
+			console.log("error");
+		},
+		complete: function() {
+			console.log("complete function");   
+		}
+	});
+	
+	//Ajax code for creating a node in Neo4j.
+	//Authentication header of ajax request.
+	}else{
+		$.ajaxSetup({
+		headers: {
 			"Authorization": "Basic bmVvNGo6T2NlYW4=" 
 			}
 		});
-		
+		var restServerURL = "http://localhost:7474/db/data";
+		tableDataJson["uri"]=data.self;
+
+		//Ajax request for saving a Node with Node json properties as input.	
+		$.ajax({
+			async: false,
+			type: "POST",
+			url: restServerURL + "/node",
+			data: JSON.stringify(tableDataJson),
+			dataType: "json",
+			contentType: "application/json",
+			success: function( data, xhr, textStatus ) {
+				 neo4jNodeId = data.metadata.id;
+			},
+			error: function( xhr ) {
+				window.console && console.log( xhr );
+			},
+			complete: function() {
+			}
+		});
+
+		//Delete the last created node on canvas.
+		//This code needs enhancement.
+		nodes.pop();
+
+		//Create a new node on canvas with Neo4j id from Neo4j database.
+		createNode(tableDataJson["nodeName"], neo4jNodeId, true,'Driver');
+
+		// Set the property neo4jNodeId in the database to the id returned from neo4j
+		//This code needs enhancement.
+		$.ajaxSetup({
+			headers: {
+			"Authorization": "Basic bmVvNGo6T2NlYW4=" 
+			}
+		});
+		// Set the property neo4jNodeId in the database to the id returned from neo4j
+		//This code needs enhancement.
 		$.ajax({
 			type: "POST",
 			url: "http://localhost:7474/db/data/transaction/commit ",
@@ -258,9 +136,14 @@ createNode(tableDataJson["name"], neo4jNodeId, true,$('#nodeType').val());
 
 }
 
-
-
+/*****************************************************************************
+ *	Function Name: getNewPropertiesForUpdate(tableDataJson)
+ *	Description: This mehtod converts a json object to string as update method
+				 of Neo4j takes string as input.
+				 The sample input string for update is {property:'value'}
+ ****************************************************************************/
 function getNewPropertiesForUpdate(tableDataJson){
+//Creating property window data in json format.
 var relationshipType=$('#relationshipType').val();
 var tr = $('tr').length;
 for(var i=0; i < tr;i++){
@@ -280,17 +163,15 @@ $.each($('tr:eq('+i+') td'),function(){
 }
 });
 }
-//reating new properties set for update properties.
+//creating new properties string for update properties.
+//Replacing "" with '' and removing space from properties name.
 var propertiesSet=JSON.stringify(tableDataJson);
-
 propertiesSet = propertiesSet.replace(/",/g, '\',');
 propertiesSet = propertiesSet.replace(/:"/g, ':\'');
 propertiesSet = propertiesSet.replace(/"/g, "");
 propertiesSet = propertiesSet.replace(/}/g, '\'}');
 propertiesSet = propertiesSet.replace(/''/g, '\'ggg\'');
 propertiesSet = propertiesSet.replace(/\s+/g,"");
-
-//alert("data is : "+JSON.stringify(tableDataJson));
 
 return propertiesSet;
 }
@@ -305,33 +186,31 @@ return propertiesSet;
 function updateNodeProperty(nodeQueryCriteria){
 
 	var tableDataJson={};
+	//Get Node properties in string format for input of update operation.
 	var newPropertiesSet=getNewPropertiesForUpdate(tableDataJson);
+	//Get Query criteria value for updating a particular node.
 	var nodeCriteriaValue=tableDataJson[nodeQueryCriteria];
 
-	//alert("MATCH (n { "+nodeQueryCriteria+": '"+nodeCriteriaValue+"' }) SET n = "+newPropertiesSet+" RETURN n");
-// Setup AJAX Header for authorization		
-$.ajaxSetup({
-    headers: {
-        // Add authorization header in all ajax requests
-        "Authorization": "Basic bmVvNGo6T2NlYW4=" 
-    }
-});
+	// Setup AJAX Header for authorization		
+	$.ajaxSetup({
+		headers: {
+			"Authorization": "Basic bmVvNGo6T2NlYW4=" 
+		}
+	});
 
- $.ajax({
-     type: "POST",
-    url: "http://localhost:7474/db/data/transaction/commit ",
-    dataType: "json",
-    contentType: "application/json;charset=UTF-8",
-	data: JSON.stringify({"statements":[{"statement":"MATCH (n { "+nodeQueryCriteria+": '"+nodeCriteriaValue+"' }) SET n = "+newPropertiesSet+" RETURN n"}]}),
-    success: function (data, textStatus, jqXHR) {
-        // use result data...
-		//alert("Success text status is " + textStatus + " and data is " + JSON.stringify(data));
-
-    },
-    error: function (jqXHR, textStatus, errorThrown) {
-		alert("Error");
-    }
-});
+	//Ajax request for selecting a node for update and passing new properties value string for update.
+	 $.ajax({
+		 type: "POST",
+		url: "http://localhost:7474/db/data/transaction/commit ",
+		dataType: "json",
+		contentType: "application/json;charset=UTF-8",
+		data: JSON.stringify({"statements":[{"statement":"MATCH (n { "+nodeQueryCriteria+": '"+nodeCriteriaValue+"' }) SET n = "+newPropertiesSet+" RETURN n"}]}),
+		success: function (data, textStatus, jqXHR) {
+		},
+		error: function (jqXHR, textStatus, errorThrown) {
+			alert("Error");
+		}
+	});
 }
 
 
@@ -346,32 +225,30 @@ $.ajaxSetup({
 			 
  ****************************************************************************/
 function updateRelProperty(sourceNodeQueryCriteria,targetNodeQueryCriteria,neo4JID){
-	alert('1');
+
 	var tableDataJson={};
+	//Get Node properties in string format for input of update operation.
 	var newPropertiesSet=getNewPropertiesForUpdate(tableDataJson);
-
-$.ajaxSetup({
-    headers: {
-        // Add authorization header in all ajax requests
-        "Authorization": "Basic bmVvNGo6T2NlYW4=" 
-    }
-});
-
- $.ajax({
-     type: "POST",
-    url: "http://localhost:7474/db/data/transaction/commit ",
-    dataType: "json",
-    contentType: "application/json;charset=UTF-8",
-	data: JSON.stringify({"statements":[{"statement":"MATCH (n) WHERE ID(n)="+tableDataJson[sourceNodeQueryCriteria]+" MATCH (m) WHERE ID(m)="+tableDataJson[targetNodeQueryCriteria]+" OPTIONAL MATCH (n)-[r:"+tableDataJson["Relationship Type"]+"]->(m) SET r="+newPropertiesSet+" RETURN r"}]}),
-    success: function (data, textStatus, jqXHR) {
-        // use result data...
-		//alert("Success text status is " + textStatus + " and data is " + JSON.stringify(data));
-
-    },
-    error: function (jqXHR, textStatus, errorThrown) {
-		alert("Error");
-    }
-});
+	// Setup AJAX Header for authorization	
+	$.ajaxSetup({
+		headers: {
+			"Authorization": "Basic bmVvNGo6T2NlYW4=" 
+		}
+	});
+	//Ajax request for selecting a relationship for update and passing new properties value string for update.
+	//Relationship will be queried on sourceNeo4j and targetNeo4j property values.
+	 $.ajax({
+		 type: "POST",
+		url: "http://localhost:7474/db/data/transaction/commit ",
+		dataType: "json",
+		contentType: "application/json;charset=UTF-8",
+		data: JSON.stringify({"statements":[{"statement":"MATCH (n) WHERE ID(n)="+tableDataJson[sourceNodeQueryCriteria]+" MATCH (m) WHERE ID(m)="+tableDataJson[targetNodeQueryCriteria]+" OPTIONAL MATCH (n)-[r:"+tableDataJson["Relationship Type"]+"]->(m) SET r="+newPropertiesSet+" RETURN r"}]}),
+		success: function (data, textStatus, jqXHR) {
+		},
+		error: function (jqXHR, textStatus, errorThrown) {
+			alert("Error");
+		}
+	});
 }
 
 /*****************************************************************************
@@ -383,33 +260,30 @@ $.ajaxSetup({
 				information for query of relationship for deletion.
 			 
  ****************************************************************************/
-function deleteRelationship(sourceNodeQueryCriteria,targetNodeQueryCriteria,targetNodeCriteriaValue,neo4JID){
-	//MATCH (n{name:'Test1'}) OPTIONAL MATCH (n)-[r]->() DELETE n,r
-	
+function deleteRelationship(sourceNodeQueryCriteria,targetNodeQueryCriteria,targetNodeCriteriaValue,neo4JID){	
 	var tableDataJson={};
+	//Get Node properties in string format for input of update operation.
 	var newPropertiesSet=getNewPropertiesForUpdate(tableDataJson);
 	
+	// Setup AJAX Header for authorization	
 	$.ajaxSetup({
     headers: {
-        // Add authorization header in all ajax requests
         "Authorization": "Basic bmVvNGo6T2NlYW4=" 
     }
-});
-
- $.ajax({
-     type: "POST",
-    url: "http://localhost:7474/db/data/transaction/commit ",
-    dataType: "json",
-    contentType: "application/json;charset=UTF-8",
-	data: JSON.stringify({"statements":[{"statement":"MATCH (n) WHERE ID(n)="+tableDataJson[sourceNodeQueryCriteria]+" MATCH (m) WHERE ID(m)="+tableDataJson[targetNodeQueryCriteria]+" OPTIONAL MATCH (n)-[r:"+tableDataJson["Relationship Type"]+"]->(m) DELETE r"}]}),
-    success: function (data, textStatus, jqXHR) {
-        // use result data...
-		//alert("Success text status is " + textStatus + " and data is " + JSON.stringify(data));
-
-    },
-    error: function (jqXHR, textStatus, errorThrown) {
-		alert("Error");
-    }});
+	});
+	//Ajax request for deleting a relationship.
+	//Relationship will be selected on sourceNeo4j and targetNeo4j property values.
+	 $.ajax({
+		 type: "POST",
+		url: "http://localhost:7474/db/data/transaction/commit ",
+		dataType: "json",
+		contentType: "application/json;charset=UTF-8",
+		data: JSON.stringify({"statements":[{"statement":"MATCH (n) WHERE ID(n)="+tableDataJson[sourceNodeQueryCriteria]+" MATCH (m) WHERE ID(m)="+tableDataJson[targetNodeQueryCriteria]+" OPTIONAL MATCH (n)-[r:"+tableDataJson["Relationship Type"]+"]->(m) DELETE r"}]}),
+		success: function (data, textStatus, jqXHR) {
+		},
+		error: function (jqXHR, textStatus, errorThrown) {
+			alert("Error");
+		}});
 }
 
 /*****************************************************************************
@@ -419,32 +293,30 @@ function deleteRelationship(sourceNodeQueryCriteria,targetNodeQueryCriteria,targ
 				to find a specific node to delete.
  ****************************************************************************/
 function deleteNode(nodeQueryCriteria){
-	//MATCH (n{name:'Test1'}) OPTIONAL MATCH (n)-[r]->() DELETE n,r
+
 	var tableDataJson={};
+	//Get Node properties in string format for input of update operation.
 	var newPropertiesSet=getNewPropertiesForUpdate(tableDataJson);
-	
+	// Setup AJAX Header for authorization	
 	$.ajaxSetup({
     headers: {
-        // Add authorization header in all ajax requests
         "Authorization": "Basic bmVvNGo6T2NlYW4=" 
     }
-});
-
- $.ajax({
-     type: "POST",
-    url: "http://localhost:7474/db/data/transaction/commit ",
-    dataType: "json",
-    contentType: "application/json;charset=UTF-8",
-	data: JSON.stringify({"statements":[{"statement":"MATCH (n { "+nodeQueryCriteria+": '"+tableDataJson[nodeQueryCriteria]+"' }) OPTIONAL MATCH (n)-[r]->() DELETE n,r"}]}),
-    success: function (data, textStatus, jqXHR) {
-        // use result data...
-		//alert("Success text status is " + textStatus + " and data is " + JSON.stringify(data));
-
-    },
-    error: function (jqXHR, textStatus, errorThrown) {
-		alert("Error");
-    }
-});
+	});
+	//Ajax request for deleting a node.
+	//node will be selected on nodeName property value.
+	 $.ajax({
+		 type: "POST",
+		url: "http://localhost:7474/db/data/transaction/commit ",
+		dataType: "json",
+		contentType: "application/json;charset=UTF-8",
+		data: JSON.stringify({"statements":[{"statement":"MATCH (n { "+nodeQueryCriteria+": '"+tableDataJson[nodeQueryCriteria]+"' }) OPTIONAL MATCH (n)-[r]->() DELETE n,r"}]}),
+		success: function (data, textStatus, jqXHR) {
+		},
+		error: function (jqXHR, textStatus, errorThrown) {
+			alert("Error");
+		}
+	});
 }
 
 
@@ -491,7 +363,7 @@ function showGraphFromNeo4j()
 							// Push node into the node array
 							var node = {id: elementInfo.neo4jNodeId,
 										reflexive: false,
-										nodeName: elementInfo.name,
+										nodeName: elementInfo.nodeName,
 										neo4jNodeId: elementInfo.neo4jNodeId };
 							
 							node.x = 100;
@@ -548,4 +420,112 @@ function showGraphFromNeo4j()
 	});
 	
 	restart();	
+}
+
+//This method will query all the path between two nodes.
+//Each path is represented by one row in output.
+//In below example output two paths were found so two rows are there.
+//Success text status is success and data is {"results":[{"columns":["p"],"data":[{"row":[[{"title":"Tourism","name":"Tourism"},{"title":"PARENT","name":"PARENT"},{"title":"Quality","name":"Quality"}]]},{"row":[[{"title":"Tourism","name":"Tourism"},{"title":"CONTRIBUTES_TO","name":"CONTRIBUTES_TO"},{"title":"Coastal Debris","name":"Coastal Debris"},{"title":"IMPACTS","name":"IMPACTS"},{"title":"Quality","name":"Quality"}]]}]}],"errors":[]}
+
+function queryPathBetweenTwoNodes(){	
+	
+	//Get the value from fields for query parameters.
+	var selectedLevel = $("#SelectLevel option:selected").val();	
+	var region = $("input[name='seaName']:checked").val();	
+	var sourceNodeName=$( sourceNode).val();
+	var targetNodeName=$( targetNode).val();
+	
+	//Making source name and target name field blank after reading values.
+	$( sourceNode).val("");
+	$( targetNode).val("");
+
+	//Fade al the elements on canvas.
+	d3.selectAll(".node").style("opacity", 0.2);
+	d3.selectAll(".link").style("opacity", 0.2);	
+	
+	var nodesList=[];	
+	var relationshipList=[];	
+ 
+	//statements for query. If level is not All then first statement will execute to get the filtered value else later statement will execute.
+	if(selectedLevel!="All"){
+		var statement="MATCH p=({name:"+"\""+sourceNodeName+"\""+"})-[*1.."+"\""+selectedLevel+"\""+"]->({name:"+"\""+targetNodeName+"\""+"})RETURN p"; 
+	
+	}else{
+		var statement="MATCH (n { name: "+"\""+sourceNodeName+"\""+"} ),(m { name: "+"\""+targetNodeName+"\""+"} ), p = (n)-[*]-(m) RETURN p";
+	 
+	}
+
+	// Setup AJAX Header for authorization	
+	$.ajaxSetup({
+		headers: {
+			// Add authorization header in all ajax requests
+			"Authorization": "Basic bmVvNGo6T2NlYW4=" 
+		}
+	});
+	
+	//Ajax request for querying the path between two node.
+	 $.ajax({
+		 type: "POST",
+		url: "http://localhost:7474/db/data/transaction/commit ",
+		dataType: "json",
+		contentType: "application/json;charset=UTF-8",
+		data: JSON.stringify({"statements":[{"statement":statement}]}),
+		success: function (data, textStatus, jqXHR) {			
+				//Parsing the output result.
+				for(var rowCount = 0; rowCount < data.results[0].data.length; rowCount++){
+					var pathDetail=data.results[0].data[rowCount].row[0];
+					for(var k=0;k<pathDetail.length;k++){
+						var eachElementInfo=pathDetail[k];
+						
+						//If some specific region is selected Ex - Baltic then it will filter out the result with specific values.
+						if(region!="All"){
+							if(eachElementInfo["region"]==region){
+								
+								//Push elements to node and relationship list.
+								if(eachElementInfo.hasOwnProperty("title")){
+								nodesList.push(eachElementInfo);
+								}else{
+								relationshipList.push(eachElementInfo);
+								}
+								
+								//Code to highlight the values on canvas on basis of query result.	
+								if(eachElementInfo.id!=undefined){
+								
+								var nodeId=parseInt(eachElementInfo.id);
+								var newid=nodeId+1;
+									 //Highlight the node on basis of id.
+									 d3.select("#name"+newid).style("opacity",1);
+								}else{
+									 //Highlight the relationship on basis of id.
+									d3.select("#link" +eachElementInfo.sourceid+eachElementInfo.targetid).style("opacity", 1);
+								}									
+								}
+						//If region == All then no filter is required and push all elements to array.
+						}else{
+								//Push elements to node and relationship list.
+								if(eachElementInfo.hasOwnProperty("title")){
+								nodesList.push(eachElementInfo);
+								}else{
+								relationshipList.push(eachElementInfo);
+							}
+							
+							//Code to highlight the values on canvas on basis of query result.	
+							if(eachElementInfo.id!=undefined){	
+								var nodeId=parseInt(eachElementInfo.id);
+								var newid=nodeId+1;
+								//Highlight the node on basis of id.
+								 d3.select("#name"+newid).style("opacity",1);
+							}else{
+								//Highlight the relationship on basis of id.
+								d3.select("#link" +eachElementInfo.sourceid+eachElementInfo.targetid).style("opacity", 1);
+							}										
+						}
+					}
+				}
+		},
+		error: function (jqXHR, textStatus, errorThrown) {
+			alert("Error");
+		}
+	});	
+
 }
