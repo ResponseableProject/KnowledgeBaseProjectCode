@@ -4,158 +4,103 @@
 		<meta http-equiv="content-type" content="text/html; charset=UTF-8">
 		<meta charset="utf-8">
 		<title>Responseable Knowledgebase</title>
-		<meta name="generator" content="Bootply" />
-		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 		<link href="css/bootstrap.min.css" rel="stylesheet">
-		 <link rel="stylesheet" href="css/dashboard.css">
-		<!--[if lt IE 9]>
-			<script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
-		<![endif]-->
+		<link rel="stylesheet" href="css/dashboard.css">
 		<link href="css/styles.css" rel="stylesheet">
-		<style>
-			body{
-				padding:0px;
-			}
-			.btn-group {  
-				white-space: nowrap;              
-			}
-			.btn-group .btn {  
-				float: none;
-				display: inline-block;
-			}
-			 .btn + .dropdown-toggle { 
-				margin-left: -4px;
-			}
-
-			.table-responsive {
-			  overflow-x: visible !important;
-			  overflow-y: visible !important;
-			}
-			.node.type4 {
-			  fill:#000000;
-			  stroke:#1695A3; 
-			  stroke-width: 3px;
-			}
-		</style>
-
 	</head>
 	<body>
-		<!-- header -->
+		<!-- Div for header section of the web page. -->
 		<div id="top-nav" class="navbar navbar-inverse navbar-static-top">
-			<div class="container-fluid">
-				<div class="navbar-header">
-					<button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-						<span class="icon-bar"></span>
-						<span class="icon-bar"></span>
-						<span class="icon-bar"></span>
-					</button>
-					<a class="navbar-brand" href="#">Responseable Knowledgebase</a>
-				</div>
-			</div>
-			<!-- /container -->
+			<a class="navbar-brand" href="#">Responseable Knowledgebase</a>
 		</div>
-		<!-- /Header -->
+		<!-- End of Header div. -->
 
-
-<!-- Main -->
-<div class="container-fluid">
-    <div class="row">
-        <div class="col-sm-2">
-            <!-- Left column -->
-            <!--<a href="#"><strong> Graph Tools</strong></a>-->
-			<a href="#"><strong> </strong></a>
-            <hr>
-			<button onclick="createNode('Node', 0, false,'Driver')" class="btn btn-primary">Create Node</button>
-			<br>
-			<ul class="nav nav-stacked collapse in" id="queryMenu">
-				<li> Query Path</li>
+		<!-- Div for the complete web page under the header-->
+		<div class="container-fluid">
+			<!-- Div for left section of web page -->
+			<div class="col-sm-2">
+				<hr>
+				<!-- Button to create node on the canvas and in database -->
+				<button onclick="createNode('Node', 0, false,'Driver')" class="btn btn-primary">Create Node</button>
+				<br>
+				<!-- Functionality to allow user to execute a query on the database -->
+				<h5>Query Path</h5>
 				<input type="text" class="form-control" id="sourceNode" placeholder="Source Name">
 				<input type="text" class="form-control" id="targetNode" placeholder="Target Name">
-
-				
-		<select class="SelectLevel" id="SelectLevel">
-		 <option>All</option>
-            <option>5</option>
-            <option>10</option>
-            <option>50</option>
-        </select>
-		
-		<label><input type="radio" name="seaName" id="seaName" value="All">All</label> 
-		<label><input type="radio" name="seaName" id="seaName" value="Baltic">Baltic</label> 
-        <label><input type="radio" name="seaName" id="seaName" value="Med">Med</label>
-		<label><input type="radio" name="seaName" id="seaName" value="Atlantic">Atlantic</label> 
-        <label><input type="radio" name="seaName" id="seaName" value="Arctic">Arctic</label>
-	
-
+				<select class="SelectLevel" id="SelectLevel">
+				 <option>All</option>
+					<option>5</option>
+					<option>10</option>
+					<option>50</option>
+				</select>
+				<label><input type="radio" name="seaName" id="seaName" value="All">All</label> 
+				<label><input type="radio" name="seaName" id="seaName" value="Baltic">Baltic</label> 
+				<label><input type="radio" name="seaName" id="seaName" value="Med">Med</label>
+				<label><input type="radio" name="seaName" id="seaName" value="Atlantic">Atlantic</label> 
+				<label><input type="radio" name="seaName" id="seaName" value="Arctic">Arctic</label>
 				<button onclick="highlightPath()" class="btn btn-primary">Highlight Path</button>
-				
 				<button onclick="queryPathBetweenTwoNodes()" class="btn btn-primary">Query Path with criteria</button>
-			</ul>
-			
-			<br>
-			
-			<ul class="nav nav-stacked collapse in" id="relationshipMenu">
-				<li>Causal Relationship</li>
+				
+				<br>
+				
+				<!-- Create a causal relationship -->
+				<h5>Causal Relationship</h5>
 				<input type="text" class="form-control" id="relSourceNode" placeholder="Source Name">
 				<input type="text" class="form-control" id="relTargetNode" placeholder="Target Name">
 				<button onclick="createRelationship()" class="btn btn-primary">Create Relationship</button>
-			</ul>
-			
-			<button onclick="showGraphFromNeo4j()" class="btn btn-primary">Show Graph</button>
-			
-        </div>
-        <!-- /col-3 -->
-        <div class="col-sm-10">
-            <hr>
-            <div class="row">
-                <!-- center left-->
-                <div class="col-md-8">
-					<div class="panel panel-default">
-                        <div class="panel-heading">
-                            <!--<h4>DPSIR Flow</h4>-->
-							<h4> </h4>
-						</div>
-                        <div class="panel-body" id="panel-body" style="height:390px;">
-					    </div>
-                    </div>
-                    <!--/panel-->
-                    <hr>
-                </div>
-                <!--/col-->
-                <div class="col-lg-4">
-                    <div class="table-responsive" id="table-responsive">
-                    </div>
-					<div class="button">
-						<button type="button" id="addProperty" class="btn btn-primary" onclick="addNewRow()" style="visibility:hidden">Add Property</button>
-						<button type="button" id="saveChanges" class="btn btn-primary" style="margin-left:20px;visibility:hidden" onclick="saveChanges()">Save Changes</button>
-						
-												<button type="button" id="updateNodeProperty" class="btn btn-primary" onclick="updateNodeProperty('nodeName')" style="visibility:hidden">Update Node Property</button>
-						<button type="button" id="updateRelProperty" class="btn btn-primary" onclick="updateRelProperty('sourceNeo4jNodeId','targetNeo4jNodeId','ID')" style="visibility:hidden">Update Relationship Property</button>
-						<button type="button" id="deleteNode" class="btn btn-primary" style="margin-left:20px;visibility:hidden" onclick="deleteNode('nodeName')">Delete Node</button>
-						<button type="button" id="deleteRelationship" class="btn btn-primary" style="margin-left:20px;visibility:hidden" onclick="deleteRelationship('sourceNeo4jNodeId','targetNeo4jNodeId','ID')">Delete Relationship</button>
-					</div>
-                </div>
-                <!--/col-span-6-->
-            </div>
-            <!--/row-->
-        </div>
-        <!--/col-span-9-->
-    </div>
-</div>
-<!-- /Main -->
 
-<!-- script references -->
-<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.2/jquery.min.js"></script>
-<script src="js/bootstrap.min.js"></script>
-<script src="js/scripts.js"></script>
-<script src="js/bs-responsive-table-dropdown.min.js"></script>
-<script src="http://d3js.org/d3.v3.min.js"></script>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-<script src="js/main.js"></script>
-<script src="js/canvas.js"></script>
-<script src="js/neo4j.js"></script>
-<script src="js/rightSection.js"></script>
-<script type="text/javascript" src="http://mbostock.github.com/d3/d3.geom.js"></script>
-<script type="text/javascript" src="http://mbostock.github.com/d3/d3.layout.js"></script>
-</body>
+				<!-- Retrieve the graph from the database and show it on the canvas -->
+				<button onclick="showGraphFromNeo4j()" class="btn btn-primary">Show Graph</button>
+				
+			</div>
+			<!-- End of div for left section -->
+			
+			<!-- Div for centre section containing the main canvas and properties window in the right section-->
+			<div class="col-sm-10">
+				<hr>
+					<!-- Div for canvas-->
+					<div class="col-md-8">
+						<div class="panel panel-default">
+							<div class="panel-heading">
+								<h5 style="text-align: center; margin: 0px;">Graph Display Area</h5>
+							</div>
+							<div class="panel-body" id="panel-body" style="height:390px;">
+							</div>
+						</div>
+						<hr>
+					</div>
+					<!-- End of div for canvas-->
+					
+					<!-- Div for properties window in the right section -->
+					<div class="col-lg-4">
+						<!-- Div to display properties when user clicks on an element in the canvas -->
+						<div class="table-responsive" id="table-responsive">
+						</div>
+						<!-- Div containing buttons related to CRUD operations on the properties -->
+						<div class="button">
+							<button type="button" id="addProperty" class="btn btn-primary" onclick="addNewRow()" style="visibility:hidden">Add Property</button>
+							<button type="button" id="saveChanges" class="btn btn-primary" style="margin-left:20px;visibility:hidden" onclick="saveChanges()">Save Changes</button>
+							<button type="button" id="updateNodeProperty" class="btn btn-primary" onclick="updateNodeProperty('nodeName')" style="visibility:hidden">Update Node Property</button>
+							<button type="button" id="updateRelProperty" class="btn btn-primary" onclick="updateRelProperty('sourceNeo4jNodeId','targetNeo4jNodeId','ID')" style="visibility:hidden">Update Relationship Property</button>
+							<button type="button" id="deleteNode" class="btn btn-primary" style="margin-left:20px;visibility:hidden" onclick="deleteNode('nodeName')">Delete Node</button>
+							<button type="button" id="deleteRelationship" class="btn btn-primary" style="margin-left:20px;visibility:hidden" onclick="deleteRelationship('sourceNeo4jNodeId','targetNeo4jNodeId','ID')">Delete Relationship</button>
+						</div>
+					</div>
+					<!-- End div for right section-->
+			</div>
+			<!-- End of div for main canvas and right section -->
+		</div>
+		<!-- End of div for the complete web page under the header-->
+
+		<!-- Javascript modules used for the ResponSEAble User Interface -->
+		<script src="js/bootstrap.min.js"></script>
+		<script src="js/scripts.js"></script>
+		<script src="js/bs-responsive-table-dropdown.min.js"></script>
+		<script src="js/d3.v3.min.js"></script>
+		<script src="js/jquery.min_1_11_3.js"></script>
+		<script src="js/canvas.js"></script>
+		<script src="js/neo4j.js"></script>
+		<script src="js/rightSection.js"></script>
+		<script src="js/main.js"></script>
+	</body>
 </html>

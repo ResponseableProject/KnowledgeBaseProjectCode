@@ -7,9 +7,12 @@
 /*****************************************************************************
  *	Global Variables
  ****************************************************************************/
+// Variables used to hide properties when the property window is being displayed
+// in the right section.
 var hiddenDefaultPropertyNode=({"reflexive":"reflexive","neo4jNodeId":"neo4jNodeId","x":"x","y":"y","index":"index","weight":"weight","px":"px","py":"py"});
 var hiddenDefaultPropertyNodeDocument=({"reflexive":"reflexive","neo4jNodeId":"neo4jNodeId","x":"x","y":"y","index":"index","weight":"weight","px":"px","py":"py","nodeSavedToDatabase":"nodeSavedToDatabase","fixed":"fixed","nodeName":"nodeName"});
 var hiddenDefaultPropertyRelation=({"left":"left","right":"right"});
+
 var data = new Array();
 var defaultData = ({"key":"ttt","value":"ttt","uri":data.self});
 
@@ -31,7 +34,6 @@ var svg = d3.select('#panel-body')
  *	Function Name: redraw()
  *	Description: Used to implement zoom behaviour on the D3 canvas
  ****************************************************************************/
- // Moving to canvas.js
   function redraw() {
 	  d3.event.sourceEvent.stopPropagation();
       svg.attr("transform",
@@ -39,12 +41,8 @@ var svg = d3.select('#panel-body')
           + " scale(" + d3.event.scale + ")");
     } 
 
-	
-var nodeNameValue = "";
-var nodeTitleValue = "";
-
-
-// nodes and links arrays containing details displayed on canvas
+// nodes and links arrays containing details of the nodes and relationships 
+// displayed on the canvas. 
 var nodes = [],
   lastNodeId = -1,
   links = [];
@@ -116,7 +114,8 @@ function resetMouseVars() {
 function tick() {
   // draw directed edges with proper padding from node centers
   path.attr('d', function(d) {
-	  //alert("Inside tick function, d contains " + JSON.stringify(d));
+	  
+	// Variables related to the movement of elements on the canvas
     var deltaX = d.target.x - d.source.x,
         deltaY = d.target.y - d.source.y,
         dist = Math.sqrt(deltaX * deltaX + deltaY * deltaY),
@@ -139,7 +138,7 @@ function tick() {
 				sourcePadding = d.left ? 35 : 30;
 				targetPadding = d.right ? 19 : 14;
 			}
-			else
+			else // Second part of causal relationship
 			{
 				sourcePadding = d.left ? 19 : 14;
 				targetPadding = d.right ? 35 : 30;
@@ -151,6 +150,7 @@ function tick() {
 			targetPadding = d.right ? 35 : 30;
 		}
 		
+	// Variables used for the lengths of lines drawn on canvas
     var sourceX = d.source.x + (sourcePadding * normX),
         sourceY = d.source.y + (sourcePadding * normY),
         targetX = d.target.x - (targetPadding * normX),
@@ -163,7 +163,7 @@ function tick() {
 		}
 		else
 		{
-			// Curved line for relationship
+			// Curved line for causal relationship
 			return "M" + sourceX + "," + sourceY + "A" + dist + "," + dist + " 0 0,1 " + targetX + "," + targetY;
 		}
   });
@@ -254,10 +254,12 @@ var drag = force.stop().drag()
 	.attr("class", function(d){ if($('#nodeType').val()=="Document"){return 'node type4'}else{return 'node'}})
 	.attr("text-anchor", "middle")
 	.attr('r', function(d){
+		// If this is a node of type "RelationshipNodeInfo" set its radius to 14
 		if( d.nodeType == "RelationshipNodeInfo" )
 		{
 			return 14;
-		}if( d.nodeType == "Document" )
+		}
+		if( d.nodeType == "Document" )
 		{
 			return 30;
 		}
@@ -270,7 +272,7 @@ var drag = force.stop().drag()
 	.attr('id', function(d){ return 'nodeName' + d.id; })
 	.style('fill', function(d) 
 		{
-			// Changing code from using ternary operator to if statement
+			// Set the color of the node based on "nodeType"
 			if ( d === selected_node )
 			{
 				return getDPSIRColor(d.nodeType);
@@ -292,8 +294,7 @@ var drag = force.stop().drag()
       // unenlarge target node
       d3.select(this).attr('transform', '');
     })
-
-	// This appears to be where the node is being selected
+	// Code to handle the event when the user presses the mouse key down on a node
     .on('mousedown', function(d) {
       if(d3.event.ctrlKey) return;
 
@@ -302,6 +303,7 @@ var drag = force.stop().drag()
 	  selected_node = mousedown_node;
       selected_link = null;
 	  	
+	// Show the property window in the right section
 	 showPropertyWindow();
 	
       // reposition drag line
@@ -312,6 +314,7 @@ var drag = force.stop().drag()
 
       restart();
     })
+	// Code to handle event when user releases the mouse key on a node
 	.on('mouseup', function(d) {
       if(!mousedown_node) return;
 
@@ -343,6 +346,7 @@ var drag = force.stop().drag()
 	console.log("mouse up node"+JSON.stringify(mouseup_node));
 	console.log("mouse down node"+mousedown_node);
 
+	// Check if there is an existing link between these two nodes
       var link;
       link = links.filter(function(l) {
         return (l.source === source && l.target === target);
@@ -351,7 +355,7 @@ var drag = force.stop().drag()
       if(link) {
         link[direction] = true;
       } else {
-		//Creating links
+		//Create a relationship and add it to the links array
         link = {source: source, target: target, left: false, right: false, relType: "instanceOf"};
         link[direction] = true;
         links.push(link);
@@ -363,7 +367,7 @@ var drag = force.stop().drag()
       restart();
     });
 
-  // show node IDs
+  // Display the nodeName in the node
   g.append('svg:text')
       .attr('x', 0)
       .attr('y', 4)
@@ -530,7 +534,7 @@ function keydown() {
 }
 
 /*****************************************************************************
- *	Function Name: keydown()
+ *	Function Name: keyup()
  *	Description: Called when a key is released on the keyboard
  ****************************************************************************/
 function keyup() {
@@ -545,7 +549,7 @@ function keyup() {
   }
 }
 
-// app starts here
+// The canvas application starts here
 svg.on('mousedown', mousedown)
   .on('mousemove', mousemove)
   .on('mouseup', mouseup);
@@ -649,7 +653,7 @@ function createRelationshipNode(inputName, inputNeo4jNodeId, inputNodeSavedToDat
 
 /*****************************************************************************
  *	Function Name: highlightPath()
- *	Description: Highlight the path between two nodes
+ *	Description: Highlight the path between a source node and a target node
  ****************************************************************************/
 function highlightPath() {
 		
@@ -737,7 +741,8 @@ function dragstart(d) {
 
 /*****************************************************************************
  *	Function Name: getNodeByName()
- *	Description: Search for a node name on the canvas
+ *	Description: Search for a node name on the canvas and if found return the 
+ *	details of that node from the nodes array.
  ****************************************************************************/
 function getNodeByName(name)
 {
@@ -757,7 +762,8 @@ function getNodeByName(name)
 
 /*****************************************************************************
  *	Function Name: getNodeById()
- *	Description: Search for a node Id on the canvas
+ *	Description: Search for a node Id on the canvas and if found return the 
+ *	details of that node from the nodes array.
  ****************************************************************************/
 function getNodeById(id)
 {

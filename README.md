@@ -12,6 +12,18 @@ and password.
 
 4.	To view the current ResponSEAble UI open the ‘index.html’ file in a browser.
 
+Using GitHub Desktop with the ResponSEAble KnowledgebaseProject
+
+1. Install GitHub desktop from https://desktop.github.com/
+
+2. After opening the GitHub desktop application the dropdown menu from the top left corner can be used to clone a repository from GitHub
+
+3. The local changes made to the code can be compared with the GitHub by choosing the "Changes" tab at the top centre of the application
+
+4. The link "Commit to Master" at the bottom of the changes view can be used to commit the changes to the Master. Before commiting the user can add a summary and a description of the code being commited.
+
+5. The "sync" button near the top right corner can then be used to push the local changes on the Master to GitHub
+
 Testing the ResponSEAble User Interface
 
 The current functionality provided by the ResponSEAble UI includes:
